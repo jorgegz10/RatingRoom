@@ -5,9 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.*
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.ratingroom.ui.screens.LoginScreen
-import com.example.ratingroom.ui.screens.RegisterScreen
+import com.example.ratingroom.ui.screens.*
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 
 class MainActivity : ComponentActivity() {
@@ -30,24 +28,24 @@ fun RatingRoomApp() {
         "login" -> {
             LoginScreen(
                 onLoginClick = { email, password ->
-                    // TODO: Implementar lógica de autenticación
+                    // Aquí normalmente iría lógica de autenticación
                     println("Login: $email")
+                    currentScreen = "mainMenu"
                 },
                 onRegisterClick = {
                     currentScreen = "register"
                 },
                 onForgotPasswordClick = {
-                    // TODO: Implementar recuperación de contraseña
                     println("Recuperar contraseña")
                 }
             )
         }
+
         "register" -> {
             RegisterScreen(
                 onRegisterClick = { fullName, email, password, confirmPassword, favoriteGenre, birthYear ->
-                    // TODO: Implementar lógica de registro
                     println("Registro: $fullName, $email")
-                    currentScreen = "login" // Volver al login después del registro
+                    currentScreen = "login"
                 },
                 onLoginClick = {
                     currentScreen = "login"
@@ -57,13 +55,24 @@ fun RatingRoomApp() {
                 }
             )
         }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun RatingRoomAppPreview() {
-    RatingRoomTheme {
-        RatingRoomApp()
+        "mainMenu" -> {
+            MainMenuScreen(
+                onLogout = {
+                    currentScreen = "login"
+                },
+                onProfileClick = {
+                    currentScreen = "editProfile"
+                }
+            )
+        }
+
+        "editProfile" -> {
+            EditProfileScreen(
+                onBackClick = {
+                    currentScreen = "mainMenu"
+                }
+            )
+        }
     }
 }
