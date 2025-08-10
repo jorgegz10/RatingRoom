@@ -8,6 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,14 +22,15 @@ import com.example.ratingroom.ui.utils.*
 fun LoginScreen(
     onLoginClick: (String, String) -> Unit = { _, _ -> },
     onRegisterClick: () -> Unit = {},
-    onForgotPasswordClick: () -> Unit = {}
+    onForgotPasswordClick: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     GradientBackground {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -38,7 +40,7 @@ fun LoginScreen(
                 // Logo
                 Image(
                     painter = painterResource(id = R.drawable.logoratingroom),
-                    contentDescription = "Logo",
+                    contentDescription = stringResource(id = R.string.content_desc_logo),
                     modifier = Modifier.size(80.dp)
                 )
 
@@ -46,7 +48,7 @@ fun LoginScreen(
 
                 // Título
                 Text(
-                    text = "Ratingroom",
+                    text = stringResource(id = R.string.login_title),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorResource(id = R.color.black)
@@ -56,7 +58,7 @@ fun LoginScreen(
 
                 // Subtítulo
                 Text(
-                    text = "Inicia sesión para descubrir y calificar películas",
+                    text = stringResource(id = R.string.login_subtitle),
                     fontSize = 14.sp,
                     color = colorResource(id = R.color.medium_gray),
                     textAlign = TextAlign.Center
@@ -84,7 +86,7 @@ fun LoginScreen(
 
                 // Botón de iniciar sesión
                 CustomButton(
-                    text = "Iniciar sesión",
+                    text = stringResource(id = R.string.login_button),
                     onClick = { onLoginClick(email, password) }
                 )
 
@@ -96,7 +98,7 @@ fun LoginScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "¿No tienes cuenta? ",
+                        text = stringResource(id = R.string.login_no_account),
                         fontSize = 14.sp,
                         color = colorResource(id = R.color.medium_gray)
                     )
@@ -104,7 +106,7 @@ fun LoginScreen(
                         onClick = onRegisterClick
                     ) {
                         Text(
-                            text = "Regístrate aquí",
+                            text = stringResource(id = R.string.login_register_link),
                             fontSize = 14.sp,
                             color = colorResource(id = R.color.primary_blue),
                             fontWeight = FontWeight.Medium
@@ -116,7 +118,7 @@ fun LoginScreen(
 
                 // Texto adicional
                 Text(
-                    text = "Disfruta con cualquier email y contraseña",
+                    text = stringResource(id = R.string.login_demo_text),
                     fontSize = 12.sp,
                     color = colorResource(id = R.color.medium_gray),
                     textAlign = TextAlign.Center

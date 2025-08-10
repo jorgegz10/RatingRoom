@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -16,7 +17,7 @@ import com.example.ratingroom.R
 fun EmailField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: String = "Correo electrónico",
+    label: String = stringResource(R.string.correo_electr_nico),
     placeholder: String = "tu@correo.com",
     modifier: Modifier = Modifier
 ) {
