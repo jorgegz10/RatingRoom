@@ -12,9 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratingroom.ui.screens.Movie
+import com.example.ratingroom.data.models.Movie
 
 @Composable
 fun MovieCard(
@@ -49,8 +50,17 @@ fun MovieCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(movie.title, fontWeight = FontWeight.Bold)
-            Text(movie.year, fontSize = 12.sp, color = Color.Gray)
+            Text(
+                movie.title, 
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                "${movie.year} • ${movie.duration}", 
+                fontSize = 12.sp, 
+                color = Color.Gray
+            )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     Icons.Default.Star,
@@ -59,9 +69,9 @@ fun MovieCard(
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(movie.rating, fontSize = 14.sp)
+                Text(movie.rating.toString(), fontSize = 14.sp)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(movie.reviews, fontSize = 12.sp, color = Color.Gray)
+                Text("${movie.reviews} reseñas", fontSize = 12.sp, color = Color.Gray)
             }
         }
     }

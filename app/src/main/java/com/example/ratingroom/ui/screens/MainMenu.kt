@@ -15,80 +15,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.ratingroom.ui.utils.*
-
-data class Movie(
-    val title: String,
-    val year: String,
-    val genre: String,
-    val rating: String,
-    val reviews: String
-)
+import com.example.ratingroom.data.repository.MovieRepository
+import com.example.ratingroom.data.models.Movie
 
 @Composable
 fun MainMenuScreen(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    selectedGenre: String,
+    onGenreSelected: (String) -> Unit,
+    filterExpanded: Boolean,
+    onFilterExpandedChange: (Boolean) -> Unit,
+    onMovieClick: (Movie) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // String resources
-    val genres = listOf(
-        stringResource(id = R.string.genre_all),
-        stringResource(id = R.string.genre_romance),
-        stringResource(id = R.string.genre_crime),
-        stringResource(id = R.string.genre_action),
-        stringResource(id = R.string.genre_scifi),
-        stringResource(id = R.string.genre_adventure)
-    )
+    // Obtener datos del repositorio
+    val genres = MovieRepository.getGenres()
     
-    val genreAll = stringResource(id = R.string.genre_all)
-    var selectedGenre by remember { mutableStateOf(genreAll) }
-    var filterExpanded by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
-
-    val allMovies = listOf(
-        Movie(
-            stringResource(id = R.string.movie_titanic),
-            stringResource(id = R.string.year_1997),
-            stringResource(id = R.string.genre_romance),
-            stringResource(id = R.string.rating_4_5),
-            stringResource(id = R.string.reviews_3876)
-        ),
-        Movie(
-            stringResource(id = R.string.movie_pulp_fiction),
-            stringResource(id = R.string.year_1994),
-            stringResource(id = R.string.genre_crime),
-            stringResource(id = R.string.rating_4_9),
-            stringResource(id = R.string.reviews_3421)
-        ),
-        Movie(
-            stringResource(id = R.string.movie_dark_knight),
-            stringResource(id = R.string.year_2008),
-            stringResource(id = R.string.genre_action),
-            stringResource(id = R.string.rating_4_8),
-            stringResource(id = R.string.reviews_2987)
-        ),
-        Movie(
-            stringResource(id = R.string.movie_avatar),
-            stringResource(id = R.string.year_2009),
-            stringResource(id = R.string.genre_scifi),
-            stringResource(id = R.string.rating_4_4),
-            stringResource(id = R.string.reviews_2987)
-        ),
-        Movie(
-            stringResource(id = R.string.movie_jurassic_park),
-            stringResource(id = R.string.year_1993),
-            stringResource(id = R.string.genre_adventure),
-            stringResource(id = R.string.rating_4_5),
-            stringResource(id = R.string.reviews_2654)
-        ),
-        Movie(
-            stringResource(id = R.string.movie_goodfellas),
-            stringResource(id = R.string.year_1990),
-            stringResource(id = R.string.genre_crime),
-            stringResource(id = R.string.rating_4_8),
-            stringResource(id = R.string.reviews_2234)
-        )
-    )
-    
-    val movies = allMovies.filter { selectedGenre == genreAll || it.genre == selectedGenre }
+    // Filtrar películas basado en género y búsqueda
+    val filteredMovies = remember(selectedGenre, searchQuery) {
+        val moviesByGenre = MovieRepository.getMoviesByGenre(selectedGenre)
+        if (searchQuery.isBlank()) {
+            moviesByGenre
+        } else {
+            MovieRepository.searchMovies(searchQuery).filter { movie ->
+                selectedGenre == "Todos" || movie.genre == selectedGenre
+            }
+        }
+    }
 
     Column(
         modifier = modifier
@@ -98,7 +52,7 @@ fun MainMenuScreen(
         // Barra de búsqueda
         SearchBar(
             query = searchQuery,
-            onQueryChange = { searchQuery = it },
+            onQueryChange = onSearchQueryChange,
             placeholder = stringResource(id = R.string.main_menu_search_placeholder)
         )
 
@@ -107,10 +61,10 @@ fun MainMenuScreen(
         // Filtros
         FilterDropdown(
             expanded = filterExpanded,
-            onExpandedChange = { filterExpanded = it },
+            onExpandedChange = onFilterExpandedChange,
             selectedGenre = selectedGenre,
             genres = genres,
-            onGenreSelected = { selectedGenre = it }
+            onGenreSelected = onGenreSelected
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -124,17 +78,17 @@ fun MainMenuScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Grid de películas
+        // Grid de películas con LazyVerticalGrid
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxHeight()
         ) {
-            items(movies) { movie ->
+            items(filteredMovies) { movie ->
                 MovieCard(
                     movie = movie,
-                    onClick = { /* Acción al tocar película */ }
+                    onClick = { onMovieClick(movie) }
                 )
             }
         }
@@ -144,5 +98,13 @@ fun MainMenuScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewMainMenuScreen() {
-    MainMenuScreen()
+    MainMenuScreen(
+        searchQuery = "",
+        onSearchQueryChange = {},
+        selectedGenre = "Todos",
+        onGenreSelected = {},
+        filterExpanded = false,
+        onFilterExpandedChange = {},
+        onMovieClick = {}
+    )
 }

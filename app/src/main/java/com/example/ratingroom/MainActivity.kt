@@ -17,6 +17,8 @@ import androidx.compose.ui.res.stringResource
 import com.example.ratingroom.ui.screens.*
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.*
+import com.example.ratingroom.data.repository.MovieRepository
+import com.example.ratingroom.data.models.Movie
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,16 +35,33 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RatingRoomApp() {
+    // STATE HOISTING - Todos los estados principales aquí
     var currentScreen by remember { mutableStateOf("login") }
     var profileMenuExpanded by remember { mutableStateOf(false) }
+    
+    // Estados para MainMenu (hoisted)
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedGenre by remember { mutableStateOf("Todos") }
+    var filterExpanded by remember { mutableStateOf(false) }
+    var selectedMovie by remember { mutableStateOf<Movie?>(null) }
+    
+    // Estados para EditProfile (hoisted)
+    var displayName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var biography by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+    var favoriteGenre by remember { mutableStateOf("Género Favorito") }
+    var birthdate by remember { mutableStateOf("mm / dd / yyyy") }
+    var website by remember { mutableStateOf("") }
 
     // Determinar si mostrar TopBar
-    val showTopBar = currentScreen in listOf("mainMenu", "editProfile")
+    val showTopBar = currentScreen in listOf("mainMenu", "editProfile", "movieDetail")
     
     // Determinar el título del TopBar
     val topBarTitle = when (currentScreen) {
         "mainMenu" -> stringResource(id = R.string.main_menu_title)
         "editProfile" -> stringResource(id = R.string.edit_profile_title)
+        "movieDetail" -> selectedMovie?.title ?: ""
         else -> ""
     }
 
@@ -65,7 +84,7 @@ fun RatingRoomApp() {
                                         )
                                     }
                                 }
-                                "editProfile" -> {
+                                "editProfile", "movieDetail" -> {
                                     IconButton(onClick = { currentScreen = "mainMenu" }) {
                                         Icon(
                                             imageVector = Icons.Default.ArrowBack,
@@ -93,7 +112,10 @@ fun RatingRoomApp() {
                                     )
                                 }
                                 "editProfile" -> {
-                                    IconButton(onClick = { /* Guardar cambios */ }) {
+                                    IconButton(onClick = { 
+                                        // Guardar cambios
+                                        currentScreen = "mainMenu"
+                                    }) {
                                         Icon(
                                             imageVector = Icons.Default.Save,
                                             contentDescription = stringResource(id = R.string.save_button),
@@ -145,14 +167,47 @@ fun RatingRoomApp() {
 
                 "mainMenu" -> {
                     MainMenuScreen(
+                        searchQuery = searchQuery,
+                        onSearchQueryChange = { searchQuery = it },
+                        selectedGenre = selectedGenre,
+                        onGenreSelected = { selectedGenre = it },
+                        filterExpanded = filterExpanded,
+                        onFilterExpandedChange = { filterExpanded = it },
+                        onMovieClick = { movie ->
+                            selectedMovie = movie
+                            currentScreen = "movieDetail"
+                        },
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
 
                 "editProfile" -> {
                     EditProfileScreen(
+                        displayName = displayName,
+                        onDisplayNameChange = { displayName = it },
+                        email = email,
+                        onEmailChange = { email = it },
+                        biography = biography,
+                        onBiographyChange = { biography = it },
+                        location = location,
+                        onLocationChange = { location = it },
+                        favoriteGenre = favoriteGenre,
+                        onFavoriteGenreChange = { favoriteGenre = it },
+                        birthdate = birthdate,
+                        onBirthdateChange = { birthdate = it },
+                        website = website,
+                        onWebsiteChange = { website = it },
                         modifier = Modifier.padding(innerPadding)
                     )
+                }
+                
+                "movieDetail" -> {
+                    selectedMovie?.let { movie ->
+                        MovieDetailScreen(
+                            movie = movie,
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
                 }
             }
         }

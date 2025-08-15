@@ -23,6 +23,20 @@ import com.example.ratingroom.ui.utils.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
+    displayName: String,
+    onDisplayNameChange: (String) -> Unit,
+    email: String,
+    onEmailChange: (String) -> Unit,
+    biography: String,
+    onBiographyChange: (String) -> Unit,
+    location: String,
+    onLocationChange: (String) -> Unit,
+    favoriteGenre: String,
+    onFavoriteGenreChange: (String) -> Unit,
+    birthdate: String,
+    onBirthdateChange: (String) -> Unit,
+    website: String,
+    onWebsiteChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val genres = listOf("Sci-Fi", "Acción", "Drama", "Comedia", "Terror", "Romance")
@@ -77,7 +91,7 @@ fun EditProfileScreen(
         ) {
             TextInputField(
                 value = displayName,
-                onValueChange = { displayName = it },
+                onValueChange = onDisplayNameChange,
                 label = stringResource(id = R.string.display_name_label),
                 placeholder = stringResource(id = R.string.display_name_placeholder)
             )
@@ -86,7 +100,7 @@ fun EditProfileScreen(
             
             EmailField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = onEmailChange,
                 label = stringResource(id = R.string.email_label),
                 placeholder = stringResource(id = R.string.email_placeholder)
             )
@@ -95,7 +109,7 @@ fun EditProfileScreen(
             
             TextInputField(
                 value = biography,
-                onValueChange = { biography = it },
+                onValueChange = onBiographyChange,
                 label = stringResource(id = R.string.biography_label),
                 placeholder = stringResource(id = R.string.biography_placeholder)
             )
@@ -104,7 +118,7 @@ fun EditProfileScreen(
             
             TextInputField(
                 value = location,
-                onValueChange = { location = it },
+                onValueChange = onLocationChange,
                 label = stringResource(id = R.string.location_label),
                 placeholder = stringResource(id = R.string.location_placeholder)
             )
@@ -118,7 +132,7 @@ fun EditProfileScreen(
         ) {
             DropdownField(
                 value = favoriteGenre,
-                onValueChange = { favoriteGenre = it },
+                onValueChange = onFavoriteGenreChange,
                 label = stringResource(id = R.string.favorite_genre_label),
                 options = genres
             )
@@ -127,7 +141,7 @@ fun EditProfileScreen(
             
             DatePickerField(
                 value = birthdate,
-                onValueChange = { birthdate = it },
+                onValueChange = onBirthdateChange,
                 label = stringResource(id = R.string.birthdate_label)
             )
 
@@ -135,7 +149,7 @@ fun EditProfileScreen(
             
             TextInputField(
                 value = website,
-                onValueChange = { website = it },
+                onValueChange = onWebsiteChange,
                 label = stringResource(id = R.string.website_label),
                 placeholder = stringResource(id = R.string.website_placeholder),
                 keyboardType = KeyboardType.Uri
@@ -157,5 +171,20 @@ fun EditProfileScreen(
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun PreviewEditProfileScreen() {
-    EditProfileScreen()
+    EditProfileScreen(
+        displayName = "",
+        onDisplayNameChange = {},
+        email = "",
+        onEmailChange = {},
+        biography = "",
+        onBiographyChange = {},
+        location = "",
+        onLocationChange = {},
+        favoriteGenre = "Género Favorito",
+        onFavoriteGenreChange = {},
+        birthdate = "mm / dd / yyyy",
+        onBirthdateChange = {},
+        website = "",
+        onWebsiteChange = {}
+    )
 }
