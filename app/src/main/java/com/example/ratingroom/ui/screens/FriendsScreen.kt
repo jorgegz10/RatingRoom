@@ -13,9 +13,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +25,7 @@ import com.example.ratingroom.data.models.Friend
 import com.example.ratingroom.data.models.FriendActivity
 import com.example.ratingroom.data.models.FriendshipType
 import com.example.ratingroom.R
+import com.example.ratingroom.ui.theme.RatingRoomTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,135 +38,110 @@ fun FriendsScreen(
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        // Header con degradado
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF1A1A2E),
-                            Color(0xFF16213E)
-                        )
-                    )
-                )
+    val cs = MaterialTheme.colorScheme
+
+    GradientBackground { // ✅ usa tu util para el fondo degradado
+        Column(
+            modifier = modifier.fillMaxSize()
         ) {
-            Column {
-                // Barra superior con botón atrás y título
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = onBackClick,
-                        colors = IconButtonDefaults.iconButtonColors(
-                            contentColor = Color.White
-                        )
+            // Header (el degradado viene del fondo, aquí no ponemos background)
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Column {
+                    // Barra superior con botón atrás y título
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Atrás"
+                        IconButton(
+                            onClick = onBackClick,
+                            colors = IconButtonDefaults.iconButtonColors(
+                                contentColor = cs.onPrimary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Atrás"
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        Text(
+                            text = "Amigos",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = cs.onPrimary,
+                            modifier = Modifier.weight(1f)
                         )
+
+                        IconButton(
+                            onClick = { /* Acción de búsqueda */ },
+                            colors = IconButtonDefaults.iconButtonColors(
+                                contentColor = cs.onPrimary
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Buscar"
+                            )
+                        }
                     }
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    Text(
-                        text = "Amigos",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    IconButton(
-                        onClick = { /* Acción de búsqueda */ },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            contentColor = Color.White
-                        )
+
+                    // Estadísticas
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = "Buscar"
-                        )
+                        StatItem(number = "3", label = "Siguiendo", modifier = Modifier.weight(1f))
+                        StatItem(number = "4", label = "Seguidores", modifier = Modifier.weight(1f))
+                        StatItem(number = "2", label = "Mutuos",    modifier = Modifier.weight(1f))
                     }
+
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                
-                // Estadísticas
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    StatItem(
-                        number = "3",
-                        label = "Siguiendo",
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    StatItem(
-                        number = "4",
-                        label = "Seguidores",
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    StatItem(
-                        number = "2",
-                        label = "Mutuos",
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(16.dp))
             }
-        }
-        
-        // Contenido principal con fondo blanco
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color.White,
-            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+
+            // Contenido principal (superficie clara/oscura del tema)
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = cs.surface,
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
             ) {
-                // Usar SearchBar de utils (que SÍ es fijo)
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = onSearchQueryChange,
-                    placeholder = "Buscar amigos...",
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    // SearchBar (util)
+                    SearchBar(
+                        query = searchQuery,
+                        onQueryChange = onSearchQueryChange,
+                        placeholder = "Buscar amigos...",
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Tabs horizontales
-                FriendsTabRow(
-                    selectedTab = selectedTab,
-                    onTabSelected = onTabSelected
-                )
+                    // Tabs
+                    FriendsTabRow(
+                        selectedTab = selectedTab,
+                        onTabSelected = onTabSelected
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                // Contenido según la pestaña seleccionada
-                when (selectedTab) {
-                    0 -> {
-                        ActivityTab(
+                    // Contenido según la pestaña
+                    when (selectedTab) {
+                        0 -> ActivityTab(
                             searchQuery = searchQuery,
                             onFriendAction = onFriendAction,
                             modifier = Modifier.fillMaxSize()
                         )
-                    }
-                    else -> {
-                        FriendsListTab(
+                        else -> FriendsListTab(
                             tabIndex = selectedTab,
                             searchQuery = searchQuery,
                             onFriendAction = onFriendAction,
@@ -186,6 +160,7 @@ fun StatItem(
     label: String,
     modifier: Modifier = Modifier
 ) {
+    val cs = MaterialTheme.colorScheme
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -194,12 +169,12 @@ fun StatItem(
             text = number,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = cs.onPrimary
         )
         Text(
             text = label,
             fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.8f)
+            color = cs.onPrimary.copy(alpha = 0.8f)
         )
     }
 }
@@ -209,16 +184,17 @@ fun FriendsTabRow(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit
 ) {
+    val cs = MaterialTheme.colorScheme
     val tabs = listOf("Actividad", "Siguiendo", "Seguidores", "Descubrir")
-    
+
     ScrollableTabRow(
         selectedTabIndex = selectedTab,
         containerColor = Color.Transparent,
-        contentColor = Color.Black,
+        contentColor = cs.onSurface,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
                 modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                color = Color(0xFF2196F3)
+                color = cs.primary
             )
         }
     ) {
@@ -229,7 +205,7 @@ fun FriendsTabRow(
                 text = {
                     Text(
                         text = title,
-                        color = if (selectedTab == index) Color(0xFF2196F3) else Color.Gray,
+                        color = if (selectedTab == index) cs.primary else cs.onSurfaceVariant,
                         fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
                         fontSize = 14.sp
                     )
@@ -245,18 +221,12 @@ fun ActivityTab(
     onFriendAction: (Friend, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val friendsActivity = remember {
-        FriendsRepository.getFriendsActivity()
-    }
-    
+    val friendsActivity = remember { FriendsRepository.getFriendsActivity() }
     val filteredActivity = remember(searchQuery) {
-        if (searchQuery.isBlank()) {
-            friendsActivity
-        } else {
-            friendsActivity.filter { 
-                it.friend.name.contains(searchQuery, ignoreCase = true) ||
-                it.movie.contains(searchQuery, ignoreCase = true)
-            }
+        if (searchQuery.isBlank()) friendsActivity
+        else friendsActivity.filter {
+            it.friend.name.contains(searchQuery, ignoreCase = true) ||
+                    it.movie.contains(searchQuery, ignoreCase = true)
         }
     }
 
@@ -297,21 +267,17 @@ fun FriendsListTab(
             3 -> FriendsRepository.getAllFriends()
             else -> emptyList()
         }
-        
-        if (searchQuery.isBlank()) {
-            allFriends
-        } else {
-            FriendsRepository.searchFriends(searchQuery).filter { friend ->
-                when (tabIndex) {
-                    1 -> friend.relationshipType == FriendshipType.FOLLOWING || friend.relationshipType == FriendshipType.MUTUAL
-                    2 -> friend.relationshipType == FriendshipType.FOLLOWER || friend.relationshipType == FriendshipType.MUTUAL
-                    3 -> true
-                    else -> false
-                }
+        if (searchQuery.isBlank()) allFriends
+        else FriendsRepository.searchFriends(searchQuery).filter { friend ->
+            when (tabIndex) {
+                1 -> friend.relationshipType == FriendshipType.FOLLOWING || friend.relationshipType == FriendshipType.MUTUAL
+                2 -> friend.relationshipType == FriendshipType.FOLLOWER  || friend.relationshipType == FriendshipType.MUTUAL
+                3 -> true
+                else -> false
             }
         }
     }
-    
+
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
@@ -339,14 +305,16 @@ fun FriendsListTab(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewFriendsScreen() {
-    FriendsScreen(
-        searchQuery = "",
-        onSearchQueryChange = {},
-        selectedTab = 0,
-        onTabSelected = {},
-        onFriendAction = { _, _ -> },
-        onBackClick = {}
-    )
+    RatingRoomTheme {
+        FriendsScreen(
+            searchQuery = "",
+            onSearchQueryChange = {},
+            selectedTab = 0,
+            onTabSelected = {},
+            onFriendAction = { _, _ -> },
+            onBackClick = {}
+        )
+    }
 }
 
 @Composable
@@ -355,10 +323,12 @@ fun FriendCard(
     onAction: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val cs = MaterialTheme.colorScheme
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+        colors = CardDefaults.cardColors(containerColor = cs.surfaceVariant)
     ) {
         Row(
             modifier = Modifier
@@ -370,7 +340,7 @@ fun FriendCard(
             Box {
                 Surface(
                     shape = CircleShape,
-                    color = Color.LightGray,
+                    color = cs.surfaceVariant,
                     modifier = Modifier.size(50.dp)
                 ) {
                     Box(
@@ -381,17 +351,17 @@ fun FriendCard(
                             text = friend.name.first().toString(),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.DarkGray
+                            color = cs.onSurfaceVariant
                         )
                     }
                 }
-                
+
                 // Indicador de estado online
                 if (friend.isOnline) {
                     Box(
                         modifier = Modifier
                             .size(12.dp)
-                            .background(Color.Green, CircleShape)
+                            .background(cs.tertiary, CircleShape)
                             .align(Alignment.BottomEnd)
                     )
                 }
@@ -400,46 +370,42 @@ fun FriendCard(
             Spacer(modifier = Modifier.width(12.dp))
 
             // Información del amigo
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = friend.name,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = cs.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = friend.username,
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = cs.onSurfaceVariant
                 )
-                
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     if (friend.isOnline) {
                         Text(
-                            text = stringResource(id = R.string.friends_online),
+                            text = "En línea",
                             fontSize = 12.sp,
-                            color = Color.Green
+                            color = cs.tertiary
                         )
                     } else {
                         Text(
-                            text = "${stringResource(id = R.string.friends_last_seen)} ${friend.lastSeen}",
+                            text = "Visto por última vez ${friend.lastSeen}",
                             fontSize = 12.sp,
-                            color = Color.Gray
+                            color = cs.onSurfaceVariant
                         )
                     }
                 }
-                
+
                 if (friend.mutualFriends > 0) {
                     Text(
-                        text = "${friend.mutualFriends} ${stringResource(id = R.string.friends_mutual_friends)}",
+                        text = "${friend.mutualFriends} amigos en común",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = cs.onSurfaceVariant
                     )
                 }
             }
@@ -448,58 +414,48 @@ fun FriendCard(
             Column {
                 when (friend.relationshipType) {
                     FriendshipType.FRIEND, FriendshipType.MUTUAL -> {
-                        IconButton(
-                            onClick = { onAction("message") }
-                        ) {
+                        IconButton(onClick = { onAction("message") }) {
                             Icon(
                                 Icons.Default.Message,
-                                contentDescription = stringResource(id = R.string.friends_message),
-                                tint = Color.White
+                                contentDescription = "Mensaje",
+                                tint = cs.onSurface
                             )
                         }
                     }
                     FriendshipType.FOLLOWING -> {
-                        IconButton(
-                            onClick = { onAction("unfollow") }
-                        ) {
+                        IconButton(onClick = { onAction("unfollow") }) {
                             Icon(
                                 Icons.Default.PersonRemove,
-                                contentDescription = stringResource(id = R.string.friends_unfollow),
-                                tint = Color.Red
+                                contentDescription = "Dejar de seguir",
+                                tint = cs.error
                             )
                         }
                     }
                     FriendshipType.FOLLOWER -> {
-                        IconButton(
-                            onClick = { onAction("follow_back") }
-                        ) {
+                        IconButton(onClick = { onAction("follow_back") }) {
                             Icon(
                                 Icons.Default.PersonAdd,
-                                contentDescription = stringResource(id = R.string.friends_follow),
-                                tint = Color.Green
+                                contentDescription = "Seguir",
+                                tint = cs.tertiary
                             )
                         }
                     }
                     FriendshipType.NONE -> {
-                        IconButton(
-                            onClick = { onAction("add_friend") }
-                        ) {
+                        IconButton(onClick = { onAction("add_friend") }) {
                             Icon(
                                 Icons.Default.PersonAdd,
-                                contentDescription = stringResource(id = R.string.friends_add_friend),
-                                tint = Color.White
+                                contentDescription = "Agregar amigo",
+                                tint = cs.onSurface
                             )
                         }
                     }
                 }
-                
-                IconButton(
-                    onClick = { onAction("view_profile") }
-                ) {
+
+                IconButton(onClick = { onAction("view_profile") }) {
                     Icon(
                         Icons.Default.Person,
-                        contentDescription = stringResource(id = R.string.friends_view_profile),
-                        tint = Color.Gray
+                        contentDescription = "Ver perfil",
+                        tint = cs.onSurfaceVariant
                     )
                 }
             }
@@ -512,13 +468,14 @@ fun EmptyFriendsState(
     tabIndex: Int,
     modifier: Modifier = Modifier
 ) {
+    val cs = MaterialTheme.colorScheme
     val (message, icon) = when (tabIndex) {
-        0 -> Pair(stringResource(id = R.string.friends_no_friends), Icons.Default.Group)
-        1 -> Pair(stringResource(id = R.string.friends_no_following), Icons.Default.PersonAdd)
-        2 -> Pair(stringResource(id = R.string.friends_no_followers), Icons.Default.People)
-        else -> Pair("", Icons.Default.Group)
+        0 -> "Sin actividad reciente" to Icons.Default.Group
+        1 -> "Aún no sigues a nadie" to Icons.Default.PersonAdd
+        2 -> "Aún no tienes seguidores" to Icons.Default.People
+        else -> "" to Icons.Default.Group
     }
-    
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -528,20 +485,20 @@ fun EmptyFriendsState(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = Color.Gray
+            tint = cs.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = message,
             fontSize = 18.sp,
-            color = Color.Gray,
+            color = cs.onSurfaceVariant,
             fontWeight = FontWeight.Medium
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = stringResource(id = R.string.friends_add_first_friend),
+            text = "Busca y agrega a tu primer amigo",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = cs.onSurfaceVariant
         )
     }
 }
