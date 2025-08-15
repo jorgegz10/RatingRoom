@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +26,11 @@ fun LoginScreen(
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    // Colores desde tu paleta MD3 (se ve igual pero ahora responde al tema claro/oscuro)
+    val onSurface = MaterialTheme.colorScheme.onSurface
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+    val primary = MaterialTheme.colorScheme.primary
 
     GradientBackground {
         Column(
@@ -51,7 +55,7 @@ fun LoginScreen(
                     text = stringResource(id = R.string.login_title),
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colorResource(id = R.color.black)
+                    color = onSurface
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -60,7 +64,7 @@ fun LoginScreen(
                 Text(
                     text = stringResource(id = R.string.login_subtitle),
                     fontSize = 14.sp,
-                    color = colorResource(id = R.color.medium_gray),
+                    color = onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
 
@@ -100,7 +104,7 @@ fun LoginScreen(
                     Text(
                         text = stringResource(id = R.string.login_no_account),
                         fontSize = 14.sp,
-                        color = colorResource(id = R.color.medium_gray)
+                        color = onSurfaceVariant
                     )
                     TextButton(
                         onClick = onRegisterClick
@@ -108,7 +112,7 @@ fun LoginScreen(
                         Text(
                             text = stringResource(id = R.string.login_register_link),
                             fontSize = 14.sp,
-                            color = colorResource(id = R.color.primary_blue),
+                            color = primary,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -120,7 +124,7 @@ fun LoginScreen(
                 Text(
                     text = stringResource(id = R.string.login_demo_text),
                     fontSize = 12.sp,
-                    color = colorResource(id = R.color.medium_gray),
+                    color = onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
             }

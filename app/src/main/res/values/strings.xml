@@ -109,4 +109,37 @@
     
     <!-- Correo electrónico (ya existente) -->
     <string name="correo_electr_nico">Correo electrónico</string>
+    
+    <!-- STRINGS PARA FORGOT PASSWORD SCREEN -->
+    <string name="forgot_password_title">Recuperar Contraseña</string>
+    <string name="forgot_password_subtitle">Ingresa tu correo electrónico y te enviaremos las instrucciones</string>
+    <string name="forgot_password_email_label">Correo electrónico</string>
+    <string name="forgot_password_email_placeholder">tu@correo.com</string>
+    <string name="forgot_password_how_it_works">¿Cómo funciona?</string>
+    <string name="forgot_password_explanation">Te enviaremos un enlace seguro a tu correo electrónico. Haz clic en el enlace para crear una nueva contraseña.</string>
+    <string name="forgot_password_send_button">Enviar enlace de recuperación</string>
+    <string name="forgot_password_remember">¿Recordaste tu contraseña?</string>
+    <string name="forgot_password_back_to_login">Volver al inicio de sesión</string>
+    <string name="forgot_password_demo_text">Demo: Cualquier email válido funcionará</string>
+    
+    <!-- STRINGS PARA FRIENDS SCREEN -->
+    <string name="friends_title">Amigos</string>
+    <string name="friends_search_placeholder">Buscar amigos...</string>
+    <string name="friends_tab_friends">Amigos</string>
+    <string name="friends_tab_following">Siguiendo</string>
+    <string name="friends_tab_followers">Seguidores</string>
+    <string name="friends_add_friend">Agregar amigo</string>
+    <string name="friends_remove_friend">Eliminar amigo</string>
+    <string name="friends_follow">Seguir</string>
+    <string name="friends_unfollow">Dejar de seguir</string>
+    <string name="friends_message">Mensaje</string>
+    <string name="friends_view_profile">Ver perfil</string>
+    <string name="friends_online">En línea</string>
+    <string name="friends_offline">Desconectado</string>
+    <string name="friends_last_seen">Visto por última vez</string>
+    <string name="friends_mutual_friends">amigos en común</string>
+    <string name="friends_no_friends">No tienes amigos aún</string>
+    <string name="friends_no_following">No sigues a nadie</string>
+    <string name="friends_no_followers">No tienes seguidores</string>
+    <string name="friends_add_first_friend">¡Agrega tu primer amigo!</string>
 </resources>

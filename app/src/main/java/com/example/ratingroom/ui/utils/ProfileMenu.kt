@@ -18,6 +18,7 @@ fun ProfileMenu(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     onProfileClick: () -> Unit,
+    onFriendsClick: () -> Unit,
     onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -38,6 +39,10 @@ fun ProfileMenu(
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.main_menu_profile)) },
                 onClick = onProfileClick
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.friends_title)) },
+                onClick = onFriendsClick
             )
             DropdownMenuItem(
                 text = { Text(stringResource(id = R.string.main_menu_logout)) },
