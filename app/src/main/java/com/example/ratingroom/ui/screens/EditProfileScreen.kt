@@ -25,14 +25,6 @@ import com.example.ratingroom.ui.utils.*
 fun EditProfileScreen(
     modifier: Modifier = Modifier
 ) {
-    var displayName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var biography by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var favoriteGenre by remember { mutableStateOf("Género Favorito") }
-    var birthdate by remember { mutableStateOf("mm / dd / yyyy") }
-    var website by remember { mutableStateOf("") }
-    
     val genres = listOf("Sci-Fi", "Acción", "Drama", "Comedia", "Terror", "Romance")
 
     Column(
