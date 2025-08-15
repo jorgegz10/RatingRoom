@@ -19,6 +19,7 @@ import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.*
 import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.data.models.Movie
+import com.example.ratingroom.data.repository.FriendsRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,8 +54,15 @@ fun RatingRoomApp() {
     var favoriteGenre by remember { mutableStateOf("Género Favorito") }
     var birthdate by remember { mutableStateOf("mm / dd / yyyy") }
     var website by remember { mutableStateOf("") }
+    
+    // Estados para ForgotPassword (hoisted)
+    var forgotPasswordEmail by remember { mutableStateOf("") }
+    
+    // Estados para Friends (hoisted)
+    var friendsSearchQuery by remember { mutableStateOf("") }
+    var selectedFriendsTab by remember { mutableStateOf(0) }
 
-    // Determinar si mostrar TopBar
+    // EXCLUIR friends del TopBar para evitar duplicación
     val showTopBar = currentScreen in listOf("mainMenu", "editProfile", "movieDetail")
     
     // Determinar el título del TopBar
@@ -105,6 +113,10 @@ fun RatingRoomApp() {
                                             profileMenuExpanded = false
                                             currentScreen = "editProfile"
                                         },
+                                        onFriendsClick = {
+                                            profileMenuExpanded = false
+                                            currentScreen = "friends"
+                                        },
                                         onLogoutClick = {
                                             profileMenuExpanded = false
                                             currentScreen = "login"
@@ -135,36 +147,28 @@ fun RatingRoomApp() {
             when (currentScreen) {
                 "login" -> {
                     LoginScreen(
-                        onLoginClick = { email, password ->
-                            println("Login: $email")
-                            currentScreen = "mainMenu"
-                        },
-                        onRegisterClick = {
-                            currentScreen = "register"
-                        },
-                        onForgotPasswordClick = {
-                            println("Recuperar contraseña")
-                        },
-                        modifier = Modifier.padding(innerPadding)
+                        onLoginClick = { _, _ -> currentScreen = "mainMenu" },
+                        onForgotPasswordClick = { currentScreen = "forgotPassword" },
+                        onRegisterClick = { currentScreen = "register" }
                     )
                 }
-
+                
                 "register" -> {
                     RegisterScreen(
-                        onRegisterClick = { fullName, email, password, confirmPassword, favoriteGenre, birthYear ->
-                            println("Registro: $fullName, $email")
-                            currentScreen = "login"
-                        },
-                        onLoginClick = {
-                            currentScreen = "login"
-                        },
-                        onBackClick = {
-                            currentScreen = "login"
-                        },
-                        modifier = Modifier.padding(innerPadding)
+                        onRegisterClick = { _, _, _, _, _, _ -> currentScreen = "login" },
+                        onLoginClick = { currentScreen = "login" }
                     )
                 }
-
+                
+                "forgotPassword" -> {
+                    ForgotPasswordScreen(
+                        email = forgotPasswordEmail,
+                        onEmailChange = { forgotPasswordEmail = it },
+                        onSendRecoveryClick = { currentScreen = "login" },
+                        onBackToLoginClick = { currentScreen = "login" }
+                    )
+                }
+                
                 "mainMenu" -> {
                     MainMenuScreen(
                         searchQuery = searchQuery,
@@ -180,7 +184,7 @@ fun RatingRoomApp() {
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
-
+                
                 "editProfile" -> {
                     EditProfileScreen(
                         displayName = displayName,
@@ -208,6 +212,39 @@ fun RatingRoomApp() {
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
+                }
+                
+                "friends" -> {
+                    // SIN innerPadding para que FriendsScreen maneje su propio layout
+                    FriendsScreen(
+                        searchQuery = friendsSearchQuery,
+                        onSearchQueryChange = { friendsSearchQuery = it },
+                        selectedTab = selectedFriendsTab,
+                        onTabSelected = { selectedFriendsTab = it },
+                        onFriendAction = { friend, action ->
+                            when (action) {
+                                "message" -> println("Enviar mensaje a ${friend.name}")
+                                "add_friend" -> {
+                                    FriendsRepository.addFriend(friend.id)
+                                    println("Amigo agregado: ${friend.name}")
+                                }
+                                "remove_friend" -> {
+                                    FriendsRepository.removeFriend(friend.id)
+                                    println("Amigo eliminado: ${friend.name}")
+                                }
+                                "follow" -> {
+                                    FriendsRepository.followUser(friend.id)
+                                    println("Siguiendo a ${friend.name}")
+                                }
+                                "unfollow" -> {
+                                    FriendsRepository.unfollowUser(friend.id)
+                                    println("Dejando de seguir a ${friend.name}")
+                                }
+                            }
+                        },
+                        // CONECTAR el botón atrás del FriendsScreen
+                        onBackClick = { currentScreen = "mainMenu" }
+                    )
                 }
             }
         }
