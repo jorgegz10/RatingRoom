@@ -19,10 +19,11 @@ fun FriendActivityCard(
     onAction: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val surface = MaterialTheme.colorScheme.surface
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = surface)
     ) {
         Column(
             modifier = Modifier

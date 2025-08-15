@@ -28,6 +28,7 @@ fun PasswordField(
     onForgotPasswordClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val onSurface = MaterialTheme.colorScheme.onSurface
     var passwordVisible by remember { mutableStateOf(false) }
     
     Column(
@@ -42,7 +43,7 @@ fun PasswordField(
                 Text(
                     text = label,
                     fontSize = 14.sp,
-                    color = colorResource(id = R.color.black)
+                    color = onSurface
                 )
                 TextButton(
                     onClick = onForgotPasswordClick
@@ -58,7 +59,7 @@ fun PasswordField(
             Text(
                 text = label,
                 fontSize = 14.sp,
-                color = colorResource(id = R.color.black),
+                color = onSurface,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
@@ -91,8 +92,8 @@ fun PasswordField(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = colorResource(id = R.color.primary_blue),
                 unfocusedBorderColor = colorResource(id = R.color.light_gray),
-                focusedTextColor = colorResource(id = R.color.black),
-                unfocusedTextColor = colorResource(id = R.color.black)
+                focusedTextColor = onSurface,
+                unfocusedTextColor = onSurface
             ),
             shape = RoundedCornerShape(8.dp)
         )

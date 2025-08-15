@@ -14,14 +14,18 @@ import com.example.ratingroom.R
 fun AuthCard(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit
-) {
+)
+{
+    val surface = MaterialTheme.colorScheme.surface
+    val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
+    val primary = MaterialTheme.colorScheme.primary
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(id = R.color.white)
+            containerColor = surface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
