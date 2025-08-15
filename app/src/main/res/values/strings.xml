@@ -1,3 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Nombre de la aplicación -->
     <string name="app_name">RatingRoom</string>
+    
+    <!-- Pantalla de Login -->
+    <string name="login_title">Ratingroom</string>
+    <string name="login_subtitle">Inicia sesión para descubrir y calificar películas</string>
+    <string name="login_button">Iniciar sesión</string>
+    <string name="login_no_account">¿No tienes cuenta? </string>
+    <string name="login_register_link">Regístrate aquí</string>
+    <string name="login_demo_text">Disfruta con cualquier email y contraseña</string>
+    
+    <!-- Pantalla de Registro -->
+    <string name="register_title">Crear Cuenta</string>
+    <string name="register_subtitle">Únete a Ratingroom y descubre películas increíbles</string>
+    <string name="register_button">Crear cuenta</string>
+    <string name="register_has_account">¿Ya tienes cuenta? </string>
+    <string name="register_login_link">Inicia sesión aquí</string>
+    <string name="register_community_text">Únete a nuestra comunidad de amantes del cine</string>
+    <string name="register_terms">Acepto los términos y condiciones</string>
+    
+    <!-- Campos de formulario -->
+    <string name="field_email">Email</string>
+    <string name="field_password">Contraseña</string>
+    <string name="field_full_name">Nombre completo</string>
+    <string name="field_full_name_placeholder">Tu nombre</string>
+    <string name="field_confirm_password">Confirmar contraseña</string>
+    <string name="field_confirm_password_placeholder">Confirma tu contraseña</string>
+    <string name="field_favorite_genre">Género favorito (opcional)</string>
+    <string name="field_favorite_genre_placeholder">Acción, Drama, Comedia...</string>
+    <string name="field_birth_year">Año de nacimiento (opcional)</string>
+    <string name="field_birth_year_placeholder">1990</string>
+    
+    <!-- Menú Principal -->
+    <string name="main_menu_title">Ratingroom</string>
+    <string name="main_menu_search_placeholder">Buscar películas, géneros, directores...</string>
+    <string name="main_menu_filters">Filtros</string>
+    <string name="main_menu_popular_movies">Películas Populares</string>
+    <string name="main_menu_profile">Mi perfil</string>
+    <string name="main_menu_logout">Cerrar sesión</string>
+    
+    <!-- STRINGS FALTANTES PARA MAINACTIVITY -->
+    <string name="edit_profile_title">Editar Perfil</string>
+    <string name="back_button">Volver</string>
+    <string name="save_button">Guardar</string>
+    
+    <!-- STRINGS FALTANTES PARA EDITPROFILESCREEN - AGREGAR AL FINAL -->
+    <string name="change_photo">Cambiar foto</string>
+    <string name="change_photo_hint">Toca para cambiar foto</string>
+    <string name="personal_info_title">Información Personal</string>
+    <string name="display_name_label">Nombre para mostrar</string>
+    <string name="display_name_placeholder">Tu nombre público</string>
+    <string name="email_label">Correo electrónico</string>
+    <string name="email_placeholder">tu@email.com</string>
+    <string name="biography_label">Biografía</string>
+    <string name="biography_placeholder">Cuéntanos sobre ti...</string>
+    <string name="location_label">Ubicación</string>
+    <string name="location_placeholder">Tu ciudad</string>
+    <string name="preferences_title">Preferencias</string>
+    <string name="favorite_genre_label">Género favorito</string>
+    <string name="birthdate_label">Fecha de nacimiento</string>
+    <string name="website_label">Sitio web</string>
+    <string name="website_placeholder">https://tu-sitio.com</string>
+    <string name="save_changes">Guardar cambios</string>
+
+    
+    <!-- Géneros de películas -->
+    <string name="genre_all">Todos</string>
+    <string name="genre_romance">Romance</string>
+    <string name="genre_crime">Crime</string>
+    <string name="genre_action">Action</string>
+    <string name="genre_scifi">Sci-Fi</string>
+    <string name="genre_adventure">Adventure</string>
+    
+    <!-- Películas de ejemplo -->
+    <string name="movie_titanic">Titanic</string>
+    <string name="movie_pulp_fiction">Pulp Fiction</string>
+    <string name="movie_dark_knight">The Dark Knight</string>
+    <string name="movie_avatar">Avatar</string>
+    <string name="movie_jurassic_park">Jurassic Park</string>
+    <string name="movie_goodfellas">Goodfellas</string>
+    
+    <!-- Años de películas -->
+    <string name="year_1990">1990</string>
+    <string name="year_1993">1993</string>
+    <string name="year_1994">1994</string>
+    <string name="year_1997">1997</string>
+    <string name="year_2008">2008</string>
+    <string name="year_2009">2009</string>
+    
+    <!-- Ratings y reseñas -->
+    <string name="rating_4_4">4.4</string>
+    <string name="rating_4_5">4.5</string>
+    <string name="rating_4_8">4.8</string>
+    <string name="rating_4_9">4.9</string>
+    <string name="reviews_2234">2234 reseñas</string>
+    <string name="reviews_2654">2654 reseñas</string>
+    <string name="reviews_2987">2987 reseñas</string>
+    <string name="reviews_3421">3421 reseñas</string>
+    <string name="reviews_3876">3876 reseñas</string>
+    
+    <!-- Descripciones de contenido -->
+    <string name="content_desc_logo">Logo</string>
+    <string name="content_desc_back">Volver</string>
+    
+    <!-- Textos generales -->
+    <string name="forgot_password">¿Olvidaste tu contraseña?</string>
+    
+    <!-- Correo electrónico (ya existente) -->
+    <string name="correo_electr_nico">Correo electrónico</string>
+    
+    <!-- STRINGS PARA FORGOT PASSWORD SCREEN -->
+    <string name="forgot_password_title">Recuperar Contraseña</string>
+    <string name="forgot_password_subtitle">Ingresa tu correo electrónico y te enviaremos las instrucciones</string>
+    <string name="forgot_password_email_label">Correo electrónico</string>
+    <string name="forgot_password_email_placeholder">tu@correo.com</string>
+    <string name="forgot_password_how_it_works">¿Cómo funciona?</string>
+    <string name="forgot_password_explanation">Te enviaremos un enlace seguro a tu correo electrónico. Haz clic en el enlace para crear una nueva contraseña.</string>
+    <string name="forgot_password_send_button">Enviar enlace de recuperación</string>
+    <string name="forgot_password_remember">¿Recordaste tu contraseña?</string>
+    <string name="forgot_password_back_to_login">Volver al inicio de sesión</string>
+    <string name="forgot_password_demo_text">Demo: Cualquier email válido funcionará</string>
+    
+    <!-- STRINGS PARA FRIENDS SCREEN -->
+    <string name="friends_title">Amigos</string>
+    <string name="friends_search_placeholder">Buscar amigos...</string>
+    <string name="friends_tab_friends">Amigos</string>
+    <string name="friends_tab_following">Siguiendo</string>
+    <string name="friends_tab_followers">Seguidores</string>
+    <string name="friends_add_friend">Agregar amigo</string>
+    <string name="friends_remove_friend">Eliminar amigo</string>
+    <string name="friends_follow">Seguir</string>
+    <string name="friends_unfollow">Dejar de seguir</string>
+    <string name="friends_message">Mensaje</string>
+    <string name="friends_view_profile">Ver perfil</string>
+    <string name="friends_online">En línea</string>
+    <string name="friends_offline">Desconectado</string>
+    <string name="friends_last_seen">Visto por última vez</string>
+    <string name="friends_mutual_friends">amigos en común</string>
+    <string name="friends_no_friends">No tienes amigos aún</string>
+    <string name="friends_no_following">No sigues a nadie</string>
+    <string name="friends_no_followers">No tienes seguidores</string>
+    <string name="friends_add_first_friend">¡Agrega tu primer amigo!</string>
 </resources>

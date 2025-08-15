@@ -4,14 +4,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import com.example.ratingroom.ui.screens.*
 import com.example.ratingroom.ui.theme.RatingRoomTheme
+import com.example.ratingroom.ui.utils.*
+import com.example.ratingroom.data.repository.MovieRepository
+import com.example.ratingroom.data.models.Movie
+import com.example.ratingroom.data.repository.FriendsRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +27,226 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RatingRoomTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                RatingRoomApp()
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun RatingRoomApp() {
+    // STATE HOISTING - Todos los estados principales aquí
+    var currentScreen by remember { mutableStateOf("login") }
+    var profileMenuExpanded by remember { mutableStateOf(false) }
+    
+    // Estados para MainMenu (hoisted)
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedGenre by remember { mutableStateOf("Todos") }
+    var filterExpanded by remember { mutableStateOf(false) }
+    var selectedMovie by remember { mutableStateOf<Movie?>(null) }
+    
+    // Estados para EditProfile (hoisted)
+    var displayName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var biography by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+    var favoriteGenre by remember { mutableStateOf("Género Favorito") }
+    var birthdate by remember { mutableStateOf("mm / dd / yyyy") }
+    var website by remember { mutableStateOf("") }
+    
+    // Estados para ForgotPassword (hoisted)
+    var forgotPasswordEmail by remember { mutableStateOf("") }
+    
+    // Estados para Friends (hoisted)
+    var friendsSearchQuery by remember { mutableStateOf("") }
+    var selectedFriendsTab by remember { mutableStateOf(0) }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    RatingRoomTheme {
-        Greeting("Android")
+    // EXCLUIR friends del TopBar para evitar duplicación
+    val showTopBar = currentScreen in listOf("mainMenu", "editProfile", "movieDetail")
+    
+    // Determinar el título del TopBar
+    val topBarTitle = when (currentScreen) {
+        "mainMenu" -> stringResource(id = R.string.main_menu_title)
+        "editProfile" -> stringResource(id = R.string.edit_profile_title)
+        "movieDetail" -> selectedMovie?.title ?: ""
+        else -> ""
+    }
+
+    GradientBackground {
+        Scaffold(
+            topBar = {
+                if (showTopBar) {
+                    TopAppBar(
+                        title = {
+                            Text(topBarTitle, color = Color.White)
+                        },
+                        navigationIcon = {
+                            when (currentScreen) {
+                                "mainMenu" -> {
+                                    IconButton(onClick = { /* Logo */ }) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.logoratingroom),
+                                            contentDescription = stringResource(id = R.string.content_desc_logo),
+                                            tint = Color.Unspecified
+                                        )
+                                    }
+                                }
+                                "editProfile", "movieDetail" -> {
+                                    IconButton(onClick = { currentScreen = "mainMenu" }) {
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowBack,
+                                            contentDescription = stringResource(id = R.string.back_button),
+                                            tint = Color.White
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        actions = {
+                            when (currentScreen) {
+                                "mainMenu" -> {
+                                    ProfileMenu(
+                                        expanded = profileMenuExpanded,
+                                        onExpandedChange = { profileMenuExpanded = it },
+                                        onProfileClick = {
+                                            profileMenuExpanded = false
+                                            currentScreen = "editProfile"
+                                        },
+                                        onFriendsClick = {
+                                            profileMenuExpanded = false
+                                            currentScreen = "friends"
+                                        },
+                                        onLogoutClick = {
+                                            profileMenuExpanded = false
+                                            currentScreen = "login"
+                                        }
+                                    )
+                                }
+                                "editProfile" -> {
+                                    IconButton(onClick = { 
+                                        // Guardar cambios
+                                        currentScreen = "mainMenu"
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.Save,
+                                            contentDescription = stringResource(id = R.string.save_button),
+                                            tint = Color.White
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+                    )
+                }
+            },
+            containerColor = Color.Transparent
+        ) { innerPadding ->
+            // Contenido de las pantallas
+            when (currentScreen) {
+                "login" -> {
+                    LoginScreen(
+                        onLoginClick = { _, _ -> currentScreen = "mainMenu" },
+                        onForgotPasswordClick = { currentScreen = "forgotPassword" },
+                        onRegisterClick = { currentScreen = "register" }
+                    )
+                }
+                
+                "register" -> {
+                    RegisterScreen(
+                        onRegisterClick = { _, _, _, _, _, _ -> currentScreen = "login" },
+                        onLoginClick = { currentScreen = "login" }
+                    )
+                }
+                
+                "forgotPassword" -> {
+                    ForgotPasswordScreen(
+                        email = forgotPasswordEmail,
+                        onEmailChange = { forgotPasswordEmail = it },
+                        onSendRecoveryClick = { currentScreen = "login" },
+                        onBackToLoginClick = { currentScreen = "login" }
+                    )
+                }
+                
+                "mainMenu" -> {
+                    MainMenuScreen(
+                        searchQuery = searchQuery,
+                        onSearchQueryChange = { searchQuery = it },
+                        selectedGenre = selectedGenre,
+                        onGenreSelected = { selectedGenre = it },
+                        filterExpanded = filterExpanded,
+                        onFilterExpandedChange = { filterExpanded = it },
+                        onMovieClick = { movie ->
+                            selectedMovie = movie
+                            currentScreen = "movieDetail"
+                        },
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+                
+                "editProfile" -> {
+                    EditProfileScreen(
+                        displayName = displayName,
+                        onDisplayNameChange = { displayName = it },
+                        email = email,
+                        onEmailChange = { email = it },
+                        biography = biography,
+                        onBiographyChange = { biography = it },
+                        location = location,
+                        onLocationChange = { location = it },
+                        favoriteGenre = favoriteGenre,
+                        onFavoriteGenreChange = { favoriteGenre = it },
+                        birthdate = birthdate,
+                        onBirthdateChange = { birthdate = it },
+                        website = website,
+                        onWebsiteChange = { website = it },
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
+                
+                "movieDetail" -> {
+                    selectedMovie?.let { movie ->
+                        MovieDetailScreen(
+                            movie = movie,
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                }
+                
+                "friends" -> {
+                    // SIN innerPadding para que FriendsScreen maneje su propio layout
+                    FriendsScreen(
+                        searchQuery = friendsSearchQuery,
+                        onSearchQueryChange = { friendsSearchQuery = it },
+                        selectedTab = selectedFriendsTab,
+                        onTabSelected = { selectedFriendsTab = it },
+                        onFriendAction = { friend, action ->
+                            when (action) {
+                                "message" -> println("Enviar mensaje a ${friend.name}")
+                                "add_friend" -> {
+                                    FriendsRepository.addFriend(friend.id)
+                                    println("Amigo agregado: ${friend.name}")
+                                }
+                                "remove_friend" -> {
+                                    FriendsRepository.removeFriend(friend.id)
+                                    println("Amigo eliminado: ${friend.name}")
+                                }
+                                "follow" -> {
+                                    FriendsRepository.followUser(friend.id)
+                                    println("Siguiendo a ${friend.name}")
+                                }
+                                "unfollow" -> {
+                                    FriendsRepository.unfollowUser(friend.id)
+                                    println("Dejando de seguir a ${friend.name}")
+                                }
+                            }
+                        },
+                        // CONECTAR el botón atrás del FriendsScreen
+                        onBackClick = { currentScreen = "mainMenu" }
+                    )
+                }
+            }
+        }
     }
 }
