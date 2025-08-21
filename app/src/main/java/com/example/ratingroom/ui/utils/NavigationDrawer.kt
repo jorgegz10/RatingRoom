@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -70,11 +71,12 @@ fun ModernNavigationDrawer(
         )
     }
 
-    // Drawer principal
+    // Drawer principal con WindowInsets
     Box(
         modifier = modifier
             .width(animatedWidth)
             .fillMaxHeight()
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Start + WindowInsetsSides.Top + WindowInsetsSides.Bottom))
             .zIndex(2f)
     ) {
         if (animatedWidth > 0.dp) {
@@ -129,7 +131,7 @@ private fun DrawerHeader(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .graphicsLayer() { this.alpha = alpha },
+            .graphicsLayer { this.alpha = alpha },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Logo y título
@@ -313,7 +315,7 @@ private fun LogoutSection(
     Column(
         modifier = Modifier.graphicsLayer { this.alpha = alpha }
     ) {
-        Divider(
+        HorizontalDivider(
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
             modifier = Modifier.padding(vertical = 16.dp)
         )
