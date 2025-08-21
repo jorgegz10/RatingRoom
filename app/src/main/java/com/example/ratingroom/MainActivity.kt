@@ -82,9 +82,14 @@ fun RatingRoomApp() {
     }
 
     GradientBackground {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+        ) {
             // Contenido principal
             Scaffold(
+                modifier = Modifier.fillMaxSize(),
                 topBar = {
                     // TopBar solo para pantallas principales con drawer
                     if (currentScreen in listOf("mainMenu", "friends") && currentScreen != "login" && currentScreen != "register" && currentScreen != "forgotPassword") {
@@ -103,7 +108,8 @@ fun RatingRoomApp() {
                         }
                     }
                 },
-                containerColor = Color.Transparent
+                containerColor = Color.Transparent,
+                contentWindowInsets = WindowInsets(0, 0, 0, 0)
             ) { innerPadding ->
                 // Contenido de las pantallas
                 when (currentScreen) {

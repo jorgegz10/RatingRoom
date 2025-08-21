@@ -1,5 +1,8 @@
 package com.example.ratingroom.ui.utils
 
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.only
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
@@ -7,6 +10,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.ratingroom.R
@@ -96,6 +100,7 @@ fun AppTopBar(
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Black
-        )
+        ),
+        windowInsets = WindowInsets.Companion.systemBars.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
     )
 }
