@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 fun RatingRoomApp() {
     // STATE HOISTING - Todos los estados principales aquí
     var currentScreen by remember { mutableStateOf("login") }
-    var profileMenuExpanded by remember { mutableStateOf(false) }
+    var isDrawerOpen by remember { mutableStateOf(false) }
     
     // Estados para MainMenu (hoisted)
     var searchQuery by remember { mutableStateOf("") }
@@ -58,40 +58,20 @@ fun RatingRoomApp() {
     var friendsSearchQuery by remember { mutableStateOf("") }
     var selectedFriendsTab by remember { mutableStateOf(0) }
 
-    // Configuración de TopBar según la pantalla
+    // Función de navegación
+    val navigateToScreen: (String) -> Unit = { screen ->
+        currentScreen = screen
+        isDrawerOpen = false
+    }
+
+    // Configuración de TopBar simplificada (solo para pantallas que necesitan botón atrás)
     val topBarConfig = when (currentScreen) {
-        "mainMenu" -> TopBarConfig(
-            title = stringResource(id = R.string.main_menu_title),
-            showLogo = true,
-            showProfileMenu = true,
-            profileMenuExpanded = profileMenuExpanded,
-            onProfileMenuExpandedChange = { profileMenuExpanded = it },
-            onProfileClick = {
-                profileMenuExpanded = false
-                currentScreen = "editProfile"
-            },
-            onFriendsClick = {
-                profileMenuExpanded = false
-                currentScreen = "friends"
-            },
-            onLogoutClick = {
-                profileMenuExpanded = false
-                currentScreen = "login"
-            }
-        )
         "editProfile" -> TopBarConfig(
             title = stringResource(id = R.string.edit_profile_title),
             showBackButton = true,
             showSaveButton = true,
             onBackClick = { currentScreen = "mainMenu" },
             onSaveClick = { currentScreen = "mainMenu" }
-        )
-        "friends" -> TopBarConfig(
-            title = "Amigos",
-            showBackButton = true,
-            showSearchButton = false,  // CAMBIADO: de true a false
-            onBackClick = { currentScreen = "mainMenu" },
-            onSearchClick = { /* Acción de búsqueda */ }
         )
         "movieDetail" -> TopBarConfig(
             title = selectedMovie?.title ?: "",
@@ -102,115 +82,145 @@ fun RatingRoomApp() {
     }
 
     GradientBackground {
-        Scaffold(
-            topBar = {
-                topBarConfig?.let { config ->
-                    AppTopBar(config = config)
-                }
-            },
-            containerColor = Color.Transparent
-        ) { innerPadding ->
-            // Contenido de las pantallas
-            when (currentScreen) {
-                "login" -> {
-                    LoginScreen(
-                        onLoginClick = { _, _ -> currentScreen = "mainMenu" },
-                        onForgotPasswordClick = { currentScreen = "forgotPassword" },
-                        onRegisterClick = { currentScreen = "register" }
-                    )
-                }
-                
-                "register" -> {
-                    RegisterScreen(
-                        onRegisterClick = { _, _, _, _, _, _ -> currentScreen = "login" },
-                        onLoginClick = { currentScreen = "login" }
-                    )
-                }
-                
-                "forgotPassword" -> {
-                    ForgotPasswordScreen(
-                        email = forgotPasswordEmail,
-                        onEmailChange = { forgotPasswordEmail = it },
-                        onSendRecoveryClick = { currentScreen = "login" },
-                        onBackToLoginClick = { currentScreen = "login" }
-                    )
-                }
-                
-                "mainMenu" -> {
-                    MainMenuScreen(
-                        searchQuery = searchQuery,
-                        onSearchQueryChange = { searchQuery = it },
-                        selectedGenre = selectedGenre,
-                        onGenreSelected = { selectedGenre = it },
-                        filterExpanded = filterExpanded,
-                        onFilterExpandedChange = { filterExpanded = it },
-                        onMovieClick = { movie ->
-                            selectedMovie = movie
-                            currentScreen = "movieDetail"
-                        },
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-                
-                "editProfile" -> {
-                    EditProfileScreen(
-                        displayName = displayName,
-                        onDisplayNameChange = { displayName = it },
-                        email = email,
-                        onEmailChange = { email = it },
-                        biography = biography,
-                        onBiographyChange = { biography = it },
-                        location = location,
-                        onLocationChange = { location = it },
-                        favoriteGenre = favoriteGenre,
-                        onFavoriteGenreChange = { favoriteGenre = it },
-                        birthdate = birthdate,
-                        onBirthdateChange = { birthdate = it },
-                        website = website,
-                        onWebsiteChange = { website = it },
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-                
-                "movieDetail" -> {
-                    selectedMovie?.let { movie ->
-                        MovieDetailScreen(
-                            movie = movie,
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Contenido principal
+            Scaffold(
+                topBar = {
+                    // TopBar solo para pantallas principales con drawer
+                    if (currentScreen in listOf("mainMenu", "friends") && currentScreen != "login" && currentScreen != "register" && currentScreen != "forgotPassword") {
+                        ModernTopBar(
+                            title = when (currentScreen) {
+                                "mainMenu" -> stringResource(id = R.string.main_menu_title)
+                                "friends" -> "Amigos"
+                                else -> ""
+                            },
+                            onMenuClick = { isDrawerOpen = true }
+                        )
+                    } else {
+                        // TopBar tradicional para otras pantallas
+                        topBarConfig?.let { config ->
+                            AppTopBar(config = config)
+                        }
+                    }
+                },
+                containerColor = Color.Transparent
+            ) { innerPadding ->
+                // Contenido de las pantallas
+                when (currentScreen) {
+                    "login" -> {
+                        LoginScreen(
+                            onLoginClick = { _, _ -> currentScreen = "mainMenu" },
+                            onForgotPasswordClick = { currentScreen = "forgotPassword" },
+                            onRegisterClick = { currentScreen = "register" }
+                        )
+                    }
+                    
+                    "register" -> {
+                        RegisterScreen(
+                            onRegisterClick = { _, _, _, _, _, _ -> currentScreen = "login" },
+                            onLoginClick = { currentScreen = "login" }
+                        )
+                    }
+                    
+                    "forgotPassword" -> {
+                        ForgotPasswordScreen(
+                            email = forgotPasswordEmail,
+                            onEmailChange = { forgotPasswordEmail = it },
+                            onSendRecoveryClick = { currentScreen = "login" },
+                            onBackToLoginClick = { currentScreen = "login" }
+                        )
+                    }
+                    
+                    "mainMenu" -> {
+                        MainMenuScreen(
+                            searchQuery = searchQuery,
+                            onSearchQueryChange = { searchQuery = it },
+                            selectedGenre = selectedGenre,
+                            onGenreSelected = { selectedGenre = it },
+                            filterExpanded = filterExpanded,
+                            onFilterExpandedChange = { filterExpanded = it },
+                            onMovieClick = { movie ->
+                                selectedMovie = movie
+                                currentScreen = "movieDetail"
+                            },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                    
+                    "editProfile" -> {
+                        EditProfileScreen(
+                            displayName = displayName,
+                            onDisplayNameChange = { displayName = it },
+                            email = email,
+                            onEmailChange = { email = it },
+                            biography = biography,
+                            onBiographyChange = { biography = it },
+                            location = location,
+                            onLocationChange = { location = it },
+                            favoriteGenre = favoriteGenre,
+                            onFavoriteGenreChange = { favoriteGenre = it },
+                            birthdate = birthdate,
+                            onBirthdateChange = { birthdate = it },
+                            website = website,
+                            onWebsiteChange = { website = it },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+                    
+                    "movieDetail" -> {
+                        selectedMovie?.let { movie ->
+                            MovieDetailScreen(
+                                movie = movie,
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                    }
+                    
+                    "friends" -> {
+                        FriendsScreen(
+                            searchQuery = friendsSearchQuery,
+                            onSearchQueryChange = { friendsSearchQuery = it },
+                            selectedTab = selectedFriendsTab,
+                            onTabSelected = { selectedFriendsTab = it },
+                            onFriendAction = { friend, action ->
+                                when (action) {
+                                    "message" -> println("Enviar mensaje a ${friend.name}")
+                                    "add_friend" -> {
+                                        FriendsRepository.addFriend(friend.id)
+                                        println("Amigo agregado: ${friend.name}")
+                                    }
+                                    "remove_friend" -> {
+                                        FriendsRepository.removeFriend(friend.id)
+                                        println("Amigo eliminado: ${friend.name}")
+                                    }
+                                    "follow" -> {
+                                        FriendsRepository.followUser(friend.id)
+                                        println("Siguiendo a ${friend.name}")
+                                    }
+                                    "unfollow" -> {
+                                        FriendsRepository.unfollowUser(friend.id)
+                                        println("Dejando de seguir a ${friend.name}")
+                                    }
+                                }
+                            },
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
                 }
-                
-                "friends" -> {
-                    FriendsScreen(
-                        searchQuery = friendsSearchQuery,
-                        onSearchQueryChange = { friendsSearchQuery = it },
-                        selectedTab = selectedFriendsTab,
-                        onTabSelected = { selectedFriendsTab = it },
-                        onFriendAction = { friend, action ->
-                            when (action) {
-                                "message" -> println("Enviar mensaje a ${friend.name}")
-                                "add_friend" -> {
-                                    FriendsRepository.addFriend(friend.id)
-                                    println("Amigo agregado: ${friend.name}")
-                                }
-                                "remove_friend" -> {
-                                    FriendsRepository.removeFriend(friend.id)
-                                    println("Amigo eliminado: ${friend.name}")
-                                }
-                                "follow" -> {
-                                    FriendsRepository.followUser(friend.id)
-                                    println("Siguiendo a ${friend.name}")
-                                }
-                                "unfollow" -> {
-                                    FriendsRepository.unfollowUser(friend.id)
-                                    println("Dejando de seguir a ${friend.name}")
-                                }
-                            }
-                        },
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            }
+
+            // Navigation Drawer
+            if (currentScreen != "login" && currentScreen != "register" && currentScreen != "forgotPassword") {
+                ModernNavigationDrawer(
+                    isOpen = isDrawerOpen,
+                    onToggle = { isDrawerOpen = !isDrawerOpen },
+                    currentScreen = currentScreen,
+                    onNavigate = navigateToScreen,
+                    onLogout = { 
+                        currentScreen = "login"
+                        isDrawerOpen = false
+                    }
+                )
             }
         }
     }
