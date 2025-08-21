@@ -45,8 +45,8 @@ fun ProfileScreen(
             )
         )
     }
-    
-    var isDarkMode by remember { mutableStateOf(isSystemInDarkTheme()) }
+
+    var isDarkMode by remember { mutableStateOf(false) } // Placeholder, actual value determined below
     
     val cs = MaterialTheme.colorScheme
 
@@ -56,6 +56,9 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(12.dp)
         ) {
+            // Correctly access isSystemInDarkTheme() within a Composable context
+            isDarkMode = isSystemInDarkTheme()
+
             AppTopBar(
                 config = TopBarConfig(
                     title = "Mi Perfil",
@@ -213,7 +216,7 @@ fun ProfileSettings(
             )
         }
         
-        Divider()
+        HorizontalDivider()  // Changed from Divider() to HorizontalDivider()
         
         SettingsList(
             items = listOf(
@@ -240,14 +243,14 @@ fun RecentReviews(
             excerpt = "Una película increíble que te hace pensar. Los efectos visuales son espectaculares y la historia es muy original.",
             timeAgo = "Hace 3 días"
         )
-        Divider()
+        HorizontalDivider()  // Changed from Divider() to HorizontalDivider()
         ReviewCard(
             title = "The Matrix",
             rating = 4,
             excerpt = "Clásico de la ciencia ficción. Revolucionó el género y sigue vigente.",
             timeAgo = "Hace 1 semana"
         )
-        Divider()
+        HorizontalDivider()  // Changed from Divider() to HorizontalDivider()
         ReviewCard(
             title = "Interstellar",
             rating = 5,
