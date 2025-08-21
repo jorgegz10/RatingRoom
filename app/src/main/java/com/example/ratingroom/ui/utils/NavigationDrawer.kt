@@ -16,8 +16,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,20 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.ratingroom.R
-
-data class NavigationItem(
-    val id: String,
-    val title: String,
-    val icon: ImageVector,
-    val isSelected: Boolean = false
-)
+import com.example.ratingroom.navigation.Screen
 
 @Composable
 fun ModernNavigationDrawer(
     isOpen: Boolean,
     onToggle: () -> Unit,
-    currentScreen: String,
-    onNavigate: (String) -> Unit,
+    currentScreen: Screen,
+    onNavigate: (Screen) -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -209,50 +201,18 @@ private fun DrawerHeader(
 
 @Composable
 private fun NavigationItems(
-    currentScreen: String,
-    onNavigate: (String) -> Unit,
+    currentScreen: Screen,
+    onNavigate: (Screen) -> Unit,
     alpha: Float
 ) {
-    val navigationItems = listOf(
-        NavigationItem(
-            id = "mainMenu",
-            title = "Inicio",
-            icon = Icons.Default.Home,
-            isSelected = currentScreen == "mainMenu"
-        ),
-        NavigationItem(
-            id = "editProfile",
-            title = "Mi Perfil",
-            icon = Icons.Default.Person,
-            isSelected = currentScreen == "editProfile"
-        ),
-        NavigationItem(
-            id = "friends",
-            title = "Amigos",
-            icon = Icons.Default.People,
-            isSelected = currentScreen == "friends"
-        ),
-        NavigationItem(
-            id = "favorites",
-            title = "Favoritos",
-            icon = Icons.Default.Favorite,
-            isSelected = currentScreen == "favorites"
-        ),
-        NavigationItem(
-            id = "settings",
-            title = "Configuración",
-            icon = Icons.Default.Settings,
-            isSelected = currentScreen == "settings"
-        )
-    )
-
     Column(
         modifier = Modifier.graphicsLayer { this.alpha = alpha }
     ) {
-        navigationItems.forEach { item ->
+        Screen.mainScreens.forEach { screen ->
             NavigationDrawerItem(
-                item = item,
-                onClick = { onNavigate(item.id) }
+                screen = screen,
+                isSelected = currentScreen.route == screen.route,
+                onClick = { onNavigate(screen) }
             )
             Spacer(modifier = Modifier.height(4.dp))
         }
@@ -261,16 +221,17 @@ private fun NavigationItems(
 
 @Composable
 private fun NavigationDrawerItem(
-    item: NavigationItem,
+    screen: Screen,
+    isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (item.isSelected) {
+    val backgroundColor = if (isSelected) {
         MaterialTheme.colorScheme.primaryContainer
     } else {
         Color.Transparent
     }
     
-    val contentColor = if (item.isSelected) {
+    val contentColor = if (isSelected) {
         MaterialTheme.colorScheme.onPrimaryContainer
     } else {
         MaterialTheme.colorScheme.onSurface
@@ -290,17 +251,19 @@ private fun NavigationDrawerItem(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = item.icon,
-                contentDescription = item.title,
-                tint = contentColor,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
+            screen.icon?.let { icon ->
+                Icon(
+                    imageVector = icon,
+                    contentDescription = screen.title,
+                    tint = contentColor,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+            }
             Text(
-                text = item.title,
+                text = screen.title,
                 fontSize = 16.sp,
-                fontWeight = if (item.isSelected) FontWeight.Medium else FontWeight.Normal,
+                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal,
                 color = contentColor
             )
         }
