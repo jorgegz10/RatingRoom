@@ -63,4 +63,9 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // En la sección dependencies, agregar:
+    implementation("androidx.navigation:navigation-compose:2.7.5")
+    // En la sección dependencies, agregar:
+    implementation("androidx.navigation:navigation-compose:2.7.5")
 }
