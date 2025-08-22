@@ -7,16 +7,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.example.ratingroom.ui.screens.*
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.*
-import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.data.models.Movie
 import com.example.ratingroom.data.repository.FriendsRepository
 import com.example.ratingroom.navigation.Screen
+import com.example.ratingroom.navigation.Screen.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -110,31 +111,31 @@ fun RatingRoomApp() {
             ) { innerPadding ->
                 // Contenido de las pantallas
                 when (currentScreen) {
-                    is Screen.Login -> {
+                    is Login -> {
                         LoginScreen(
-                            onLoginClick = { _, _ -> currentScreen = Screen.MainMenu },
-                            onForgotPasswordClick = { currentScreen = Screen.ForgotPassword },
-                            onRegisterClick = { currentScreen = Screen.Register }
+                            onLoginClick = { _, _ -> currentScreen = MainMenu },
+                            onForgotPasswordClick = { currentScreen = ForgotPassword },
+                            onRegisterClick = { currentScreen = Register }
                         )
                     }
                     
-                    is Screen.Register -> {
+                    is Register -> {
                         RegisterScreen(
-                            onRegisterClick = { _, _, _, _, _, _ -> currentScreen = Screen.Login },
-                            onLoginClick = { currentScreen = Screen.Login }
+                            onRegisterClick = { _, _, _, _, _, _ -> currentScreen = Login },
+                            onLoginClick = { currentScreen = Login }
                         )
                     }
                     
-                    is Screen.ForgotPassword -> {
+                    is ForgotPassword -> {
                         ForgotPasswordScreen(
                             email = forgotPasswordEmail,
                             onEmailChange = { forgotPasswordEmail = it },
-                            onSendRecoveryClick = { currentScreen = Screen.Login },
-                            onBackToLoginClick = { currentScreen = Screen.Login }
+                            onSendRecoveryClick = { currentScreen = Login },
+                            onBackToLoginClick = { currentScreen = Login }
                         )
                     }
                     
-                    is Screen.MainMenu -> {
+                    is MainMenu -> {
                         MainMenuScreen(
                             searchQuery = searchQuery,
                             onSearchQueryChange = { searchQuery = it },
@@ -144,13 +145,13 @@ fun RatingRoomApp() {
                             onFilterExpandedChange = { filterExpanded = it },
                             onMovieClick = { movie ->
                                 selectedMovie = movie
-                                currentScreen = Screen.MovieDetail(movie.id.toString())
+                                currentScreen = MovieDetail(movie.id.toString())
                             },
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
                     
-                    is Screen.EditProfile -> {
+                    is EditProfile -> {
                         EditProfileScreen(
                             displayName = displayName,
                             onDisplayNameChange = { displayName = it },
@@ -170,16 +171,19 @@ fun RatingRoomApp() {
                         )
                     }
                     
-                    is Screen.MovieDetail -> {
+                    is MovieDetail -> {
                         selectedMovie?.let { movie ->
                             MovieDetailScreen(
                                 movie = movie,
+                                onShowMore = {
+                                    currentScreen = Synopsis(movie.id.toString())
+                                },
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }
                     }
                     
-                    is Screen.Friends -> {
+                    is Friends -> {
                         FriendsScreen(
                             searchQuery = friendsSearchQuery,
                             onSearchQueryChange = { friendsSearchQuery = it },
@@ -210,27 +214,47 @@ fun RatingRoomApp() {
                         )
                     }
                     
-                    is Screen.Favorites -> {
+                    is Favorites -> {
                         // Implementar pantalla de favoritos
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(innerPadding),
-                            contentAlignment = androidx.compose.ui.Alignment.Center
+                            contentAlignment = Alignment.Center
                         ) {
                             Text("Pantalla de Favoritos - En desarrollo")
                         }
                     }
                     
-                    is Screen.Settings -> {
+                    is Settings -> {
                         // Implementar pantalla de configuración
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(innerPadding),
-                            contentAlignment = androidx.compose.ui.Alignment.Center
+                            contentAlignment = Alignment.Center
                         ) {
                             Text("Pantalla de Configuración - En desarrollo")
+                        }
+                    }
+
+                    MyReviews -> {
+                        ReviewsScreen(
+                            onBack = { currentScreen = MainMenu }
+                        )
+                    }
+
+                    is Synopsis -> {
+
+                        val movie = selectedMovie
+                        if (movie != null) {
+                            SynopsisScreen(
+                                movie = movie,
+                                onBackClick = { currentScreen = MovieDetail(movie.id.toString()) },
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        } else {
+                            currentScreen = MainMenu
                         }
                     }
                 }

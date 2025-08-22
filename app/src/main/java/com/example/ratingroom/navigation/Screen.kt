@@ -16,10 +16,13 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
     object Friends : Screen("friends", "Amigos", Icons.Default.People)
     object Favorites : Screen("favorites", "Favoritos", Icons.Default.Favorite)
     object Settings : Screen("settings", "Configuración", Icons.Default.Settings)
-    
+
+    object MyReviews : Screen("my_reviews", "Mis Reseñas", Icons.Default.RateReview)
+
     // Pantallas de detalle
     data class MovieDetail(val movieId: String) : Screen("movie_detail/$movieId", "Detalle de Película")
-    
+
+    data class Synopsis(val movieId: String) : Screen("synopsis/$movieId", "Sinopsis")
     companion object {
         // Lista de pantallas principales para el drawer
         val mainScreens = listOf(
@@ -27,6 +30,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
             EditProfile,
             Friends,
             Favorites,
+            MyReviews,
             Settings
         )
         
@@ -48,9 +52,14 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
                 route == Friends.route -> Friends
                 route == Favorites.route -> Favorites
                 route == Settings.route -> Settings
+                route == MyReviews.route -> MyReviews
                 route.startsWith("movie_detail/") -> {
                     val movieId = route.substringAfter("movie_detail/")
                     MovieDetail(movieId)
+                }
+                route.startsWith("synopsis/") -> {
+                    val movieId = route.substringAfter("synopsis/")
+                    Synopsis(movieId)
                 }
                 else -> null
             }
