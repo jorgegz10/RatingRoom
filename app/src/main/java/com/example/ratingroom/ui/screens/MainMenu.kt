@@ -26,7 +26,7 @@ fun MainMenuScreen(
     onGenreSelected: (String) -> Unit,
     filterExpanded: Boolean,
     onFilterExpandedChange: (Boolean) -> Unit,
-    onMovieClick: (Movie) -> Unit,
+    onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Obtener datos del repositorio
@@ -91,7 +91,7 @@ fun MainMenuScreen(
                 items(filteredMovies) { movie ->
                     MovieCard(
                         movie = movie,
-                        onClick = { onMovieClick(movie) }
+                        onClick = { onMovieClick(movie.id) }
                     )
                 }
             }

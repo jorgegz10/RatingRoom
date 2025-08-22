@@ -1,6 +1,7 @@
 package com.example.ratingroom
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -188,9 +189,9 @@ fun RatingRoomApp() {
                             onGenreSelected = { selectedGenre = it },
                             filterExpanded = filterExpanded,
                             onFilterExpandedChange = { filterExpanded = it },
-                            onMovieClick = { movie ->
-                                selectedMovie = movie
-                                navigateToScreen(Screen.MovieDetail.createRoute(movie.id.toString()))
+                            onMovieClick = { id ->
+                                Log.d("Ayuda", "$id")
+                                navController.navigate(Screen.MovieDetail.createRoute(id))
                             }
                         )
                     }
@@ -265,21 +266,24 @@ fun RatingRoomApp() {
                     // Pantalla de detalle con parámetros
                     // En la sección del composable de MovieDetail, cambiar:
                     composable(
-                        route = Screen.MovieDetail.route,
+                        route = "movie_detail/{movieId}",
                         arguments = listOf(
                             navArgument("movieId") { 
-                                type = NavType.StringType 
+                                type = NavType.IntType
                             }
                         )
                     ) { backStackEntry ->
-                        val movieId = backStackEntry.arguments?.getString("movieId")
-                        selectedMovie?.let { movie ->
+                        val movieId = backStackEntry.arguments?.getInt("movieId")
+
+                        val movie = MovieRepository.getMovieById(movieId!!)
+
+
                             MovieDetailScreen(
-                                movie = movie,
+                                movie = movie!!,
                                 onShowMore = { /* Acción para mostrar más detalles */ },
                                 modifier = Modifier.fillMaxSize()
                             )
-                        }
+
                     }
                 }
             }
