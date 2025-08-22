@@ -36,13 +36,16 @@ fun RatingRoomApp() {
     // STATE HOISTING - Todos los estados principales aquí
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Login) }
     var isDrawerOpen by remember { mutableStateOf(false) }
-    
+
     // Estados para MainMenu (hoisted)
     var searchQuery by remember { mutableStateOf("") }
     var selectedGenre by remember { mutableStateOf("Todos") }
     var filterExpanded by remember { mutableStateOf(false) }
     var selectedMovie by remember { mutableStateOf<Movie?>(null) }
-    
+
+    // Estado para ListScreen (hoisted)
+    var selectedListTab by remember { mutableStateOf(0) }
+
     // Estados para EditProfile (hoisted)
     var displayName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -51,10 +54,10 @@ fun RatingRoomApp() {
     var favoriteGenre by remember { mutableStateOf("Género Favorito") }
     var birthdate by remember { mutableStateOf("mm / dd / yyyy") }
     var website by remember { mutableStateOf("") }
-    
+
     // Estados para ForgotPassword (hoisted)
     var forgotPasswordEmail by remember { mutableStateOf("") }
-    
+
     // Estados para Friends (hoisted)
     var friendsSearchQuery by remember { mutableStateOf("") }
     var selectedFriendsTab by remember { mutableStateOf(0) }
@@ -93,7 +96,8 @@ fun RatingRoomApp() {
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
                     // TopBar solo para pantallas principales con drawer
-                    if (currentScreen in listOf(Screen.MainMenu, Screen.Friends) && currentScreen !in Screen.authScreens) {
+                    // Agregamos Screen.ListScreen para que muestre el ModernTopBar con menú
+                    if (currentScreen in listOf(Screen.MainMenu, Screen.Friends, Screen.ListScreen) && currentScreen !in Screen.authScreens) {
                         ModernTopBar(
                             title = currentScreen.title,
                             onMenuClick = { isDrawerOpen = true }
@@ -117,14 +121,14 @@ fun RatingRoomApp() {
                             onRegisterClick = { currentScreen = Screen.Register }
                         )
                     }
-                    
+
                     is Screen.Register -> {
                         RegisterScreen(
                             onRegisterClick = { _, _, _, _, _, _ -> currentScreen = Screen.Login },
                             onLoginClick = { currentScreen = Screen.Login }
                         )
                     }
-                    
+
                     is Screen.ForgotPassword -> {
                         ForgotPasswordScreen(
                             email = forgotPasswordEmail,
@@ -133,7 +137,7 @@ fun RatingRoomApp() {
                             onBackToLoginClick = { currentScreen = Screen.Login }
                         )
                     }
-                    
+
                     is Screen.MainMenu -> {
                         MainMenuScreen(
                             searchQuery = searchQuery,
@@ -149,7 +153,15 @@ fun RatingRoomApp() {
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
-                    
+
+                    is Screen.ListScreen -> {
+                        ListScreen(
+                            selectedTab = selectedListTab,
+                            onTabSelected = { selectedListTab = it },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+
                     is Screen.EditProfile -> {
                         EditProfileScreen(
                             displayName = displayName,
@@ -169,7 +181,7 @@ fun RatingRoomApp() {
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
-                    
+
                     is Screen.MovieDetail -> {
                         selectedMovie?.let { movie ->
                             MovieDetailScreen(
@@ -178,7 +190,7 @@ fun RatingRoomApp() {
                             )
                         }
                     }
-                    
+
                     is Screen.Friends -> {
                         FriendsScreen(
                             searchQuery = friendsSearchQuery,
@@ -209,7 +221,7 @@ fun RatingRoomApp() {
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
-                    
+
                     is Screen.Favorites -> {
                         // Implementar pantalla de favoritos
                         Box(
@@ -221,7 +233,7 @@ fun RatingRoomApp() {
                             Text("Pantalla de Favoritos - En desarrollo")
                         }
                     }
-                    
+
                     is Screen.Settings -> {
                         // Implementar pantalla de configuración
                         Box(
@@ -243,7 +255,7 @@ fun RatingRoomApp() {
                     onToggle = { isDrawerOpen = !isDrawerOpen },
                     currentScreen = currentScreen,
                     onNavigate = navigateToScreen,
-                    onLogout = { 
+                    onLogout = {
                         currentScreen = Screen.Login
                         isDrawerOpen = false
                     }
