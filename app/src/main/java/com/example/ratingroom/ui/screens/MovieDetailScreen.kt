@@ -18,11 +18,15 @@ import com.example.ratingroom.data.models.Movie
 import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.GradientBackground
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.foundation.clickable
+
 
 @Composable
 fun MovieDetailScreen(
     movie: Movie,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onShowMore: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val reviews = remember { MovieRepository.getReviewsForMovie(movie.id) }
@@ -118,6 +122,13 @@ fun MovieDetailScreen(
                         color = cs.onPrimary,
                         lineHeight = 20.sp
                     )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = "Ver más",
+                        color = cs.onPrimary,
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier.clickable { onShowMore() }
+                    )
                 }
             }
 
@@ -198,6 +209,6 @@ fun PreviewMovieDetailScreen() {
             reviews = 1284,
             description = "Un equipo de exploradores viaja a través de un agujero de gusano en el espacio para asegurar el futuro de la humanidad."
         )
-        MovieDetailScreen(movie = sample)
     }
 }
+

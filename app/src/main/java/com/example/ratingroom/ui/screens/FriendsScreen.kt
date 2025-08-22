@@ -13,6 +13,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,12 +21,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ratingroom.ui.utils.*
+import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.data.repository.FriendsRepository
 import com.example.ratingroom.data.models.Friend
 import com.example.ratingroom.data.models.FriendActivity
 import com.example.ratingroom.data.models.FriendshipType
-import com.example.ratingroom.R
-import com.example.ratingroom.ui.theme.RatingRoomTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,113 +35,90 @@ fun FriendsScreen(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
     onFriendAction: (Friend, String) -> Unit,
-    onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val cs = MaterialTheme.colorScheme
-
-    GradientBackground { // ✅ usa tu util para el fondo degradado
-        Column(
-            modifier = modifier.fillMaxSize()
-        ) {
-            // Header (el degradado viene del fondo, aquí no ponemos background)
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Column {
-                    // Barra superior con botón atrás y título
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick = onBackClick,
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = cs.onPrimary
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Atrás"
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text(
-                            text = "Amigos",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = cs.onPrimary,
-                            modifier = Modifier.weight(1f)
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+        // Header con estadísticas (sin TopBar propia)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF1A1A2E),
+                            Color(0xFF16213E)
                         )
-
-                        IconButton(
-                            onClick = { /* Acción de búsqueda */ },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = cs.onPrimary
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "Buscar"
-                            )
-                        }
-                    }
-
-                    // Estadísticas
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        StatItem(number = "3", label = "Siguiendo", modifier = Modifier.weight(1f))
-                        StatItem(number = "4", label = "Seguidores", modifier = Modifier.weight(1f))
-                        StatItem(number = "2", label = "Mutuos",    modifier = Modifier.weight(1f))
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
-
-            // Contenido principal (superficie clara/oscura del tema)
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = cs.surface,
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+                    )
+                )
+                .padding(16.dp)
+        ) {
+            // Solo estadísticas
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    // SearchBar (util)
-                    SearchBar(
-                        query = searchQuery,
-                        onQueryChange = onSearchQueryChange,
-                        placeholder = "Buscar amigos...",
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                StatItem(
+                    number = "3",
+                    label = "Siguiendo",
+                    modifier = Modifier.weight(1f)
+                )
+                
+                StatItem(
+                    number = "4",
+                    label = "Seguidores",
+                    modifier = Modifier.weight(1f)
+                )
+                
+                StatItem(
+                    number = "2",
+                    label = "Mutuos",
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        
+        // Contenido principal con fondo blanco
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.White,
+            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                // Barra de búsqueda
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = onSearchQueryChange,
+                    placeholder = "Buscar amigos...",
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    // Tabs
-                    FriendsTabRow(
-                        selectedTab = selectedTab,
-                        onTabSelected = onTabSelected
-                    )
+                // Tabs horizontales
+                FriendsTabRow(
+                    selectedTab = selectedTab,
+                    onTabSelected = onTabSelected
+                )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                    // Contenido según la pestaña
-                    when (selectedTab) {
-                        0 -> ActivityTab(
+                // Contenido según la pestaña seleccionada
+                when (selectedTab) {
+                    0 -> {
+                        ActivityTab(
                             searchQuery = searchQuery,
                             onFriendAction = onFriendAction,
                             modifier = Modifier.fillMaxSize()
                         )
-                        else -> FriendsListTab(
+                    }
+                    else -> {
+                        FriendsListTab(
                             tabIndex = selectedTab,
                             searchQuery = searchQuery,
                             onFriendAction = onFriendAction,
@@ -160,7 +137,6 @@ fun StatItem(
     label: String,
     modifier: Modifier = Modifier
 ) {
-    val cs = MaterialTheme.colorScheme
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -169,12 +145,12 @@ fun StatItem(
             text = number,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = cs.onPrimary
+            color = Color.White
         )
         Text(
             text = label,
             fontSize = 14.sp,
-            color = cs.onPrimary.copy(alpha = 0.8f)
+            color = Color.White.copy(alpha = 0.8f)
         )
     }
 }
@@ -184,17 +160,16 @@ fun FriendsTabRow(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit
 ) {
-    val cs = MaterialTheme.colorScheme
     val tabs = listOf("Actividad", "Siguiendo", "Seguidores", "Descubrir")
-
+    
     ScrollableTabRow(
         selectedTabIndex = selectedTab,
         containerColor = Color.Transparent,
-        contentColor = cs.onSurface,
+        contentColor = Color.Black,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
                 modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                color = cs.primary
+                color = Color(0xFF2196F3)
             )
         }
     ) {
@@ -205,7 +180,7 @@ fun FriendsTabRow(
                 text = {
                     Text(
                         text = title,
-                        color = if (selectedTab == index) cs.primary else cs.onSurfaceVariant,
+                        color = if (selectedTab == index) Color(0xFF2196F3) else Color.Gray,
                         fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal,
                         fontSize = 14.sp
                     )
@@ -221,12 +196,18 @@ fun ActivityTab(
     onFriendAction: (Friend, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val friendsActivity = remember { FriendsRepository.getFriendsActivity() }
+    val friendsActivity = remember {
+        FriendsRepository.getFriendsActivity()
+    }
+    
     val filteredActivity = remember(searchQuery) {
-        if (searchQuery.isBlank()) friendsActivity
-        else friendsActivity.filter {
-            it.friend.name.contains(searchQuery, ignoreCase = true) ||
-                    it.movie.contains(searchQuery, ignoreCase = true)
+        if (searchQuery.isBlank()) {
+            friendsActivity
+        } else {
+            friendsActivity.filter { 
+                it.friend.name.contains(searchQuery, ignoreCase = true) ||
+                it.movie.contains(searchQuery, ignoreCase = true)
+            }
         }
     }
 
@@ -267,17 +248,21 @@ fun FriendsListTab(
             3 -> FriendsRepository.getAllFriends()
             else -> emptyList()
         }
-        if (searchQuery.isBlank()) allFriends
-        else FriendsRepository.searchFriends(searchQuery).filter { friend ->
-            when (tabIndex) {
-                1 -> friend.relationshipType == FriendshipType.FOLLOWING || friend.relationshipType == FriendshipType.MUTUAL
-                2 -> friend.relationshipType == FriendshipType.FOLLOWER  || friend.relationshipType == FriendshipType.MUTUAL
-                3 -> true
-                else -> false
+        
+        if (searchQuery.isBlank()) {
+            allFriends
+        } else {
+            FriendsRepository.searchFriends(searchQuery).filter { friend ->
+                when (tabIndex) {
+                    1 -> friend.relationshipType == FriendshipType.FOLLOWING || friend.relationshipType == FriendshipType.MUTUAL
+                    2 -> friend.relationshipType == FriendshipType.FOLLOWER || friend.relationshipType == FriendshipType.MUTUAL
+                    3 -> true
+                    else -> false
+                }
             }
         }
     }
-
+    
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         modifier = modifier
@@ -311,8 +296,7 @@ fun PreviewFriendsScreen() {
             onSearchQueryChange = {},
             selectedTab = 0,
             onTabSelected = {},
-            onFriendAction = { _, _ -> },
-            onBackClick = {}
+            onFriendAction = { _, _ -> }
         )
     }
 }
