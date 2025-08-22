@@ -34,17 +34,16 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RatingRoomApp() {
-    // STATE HOISTING - Todos los estados principales aquí
-    var currentScreen by remember { mutableStateOf<Screen>(Screen.Login) }
+    var currentScreen by remember { mutableStateOf<Screen>(Login) }
     var isDrawerOpen by remember { mutableStateOf(false) }
-    
-    // Estados para MainMenu (hoisted)
+
     var searchQuery by remember { mutableStateOf("") }
     var selectedGenre by remember { mutableStateOf("Todos") }
     var filterExpanded by remember { mutableStateOf(false) }
     var selectedMovie by remember { mutableStateOf<Movie?>(null) }
-    
-    // Estados para EditProfile (hoisted)
+
+    var selectedListTab by remember { mutableStateOf(0) }
+
     var displayName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var biography by remember { mutableStateOf("") }
@@ -52,33 +51,29 @@ fun RatingRoomApp() {
     var favoriteGenre by remember { mutableStateOf("Género Favorito") }
     var birthdate by remember { mutableStateOf("mm / dd / yyyy") }
     var website by remember { mutableStateOf("") }
-    
-    // Estados para ForgotPassword (hoisted)
+
     var forgotPasswordEmail by remember { mutableStateOf("") }
-    
-    // Estados para Friends (hoisted)
+
     var friendsSearchQuery by remember { mutableStateOf("") }
     var selectedFriendsTab by remember { mutableStateOf(0) }
 
-    // Función de navegación
     val navigateToScreen: (Screen) -> Unit = { screen ->
         currentScreen = screen
         isDrawerOpen = false
     }
 
-    // Configuración de TopBar simplificada (solo para pantallas que necesitan botón atrás)
     val topBarConfig = when (currentScreen) {
-        is Screen.EditProfile -> TopBarConfig(
+        is EditProfile -> TopBarConfig(
             title = stringResource(id = R.string.edit_profile_title),
             showBackButton = true,
             showSaveButton = true,
-            onBackClick = { currentScreen = Screen.MainMenu },
-            onSaveClick = { currentScreen = Screen.MainMenu }
+            onBackClick = { currentScreen = MainMenu },
+            onSaveClick = { currentScreen = MainMenu }
         )
-        is Screen.MovieDetail -> TopBarConfig(
+        is MovieDetail -> TopBarConfig(
             title = selectedMovie?.title ?: "",
             showBackButton = true,
-            onBackClick = { currentScreen = Screen.MainMenu }
+            onBackClick = { currentScreen = MainMenu }
         )
         else -> null
     }
@@ -89,18 +84,15 @@ fun RatingRoomApp() {
                 .fillMaxSize()
                 .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
         ) {
-            // Contenido principal
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
-                    // TopBar solo para pantallas principales con drawer
-                    if (currentScreen in listOf(Screen.MainMenu, Screen.Friends) && currentScreen !in Screen.authScreens) {
+                    if (currentScreen in listOf(MainMenu, Friends, ListScreen) && currentScreen !in Screen.authScreens) {
                         ModernTopBar(
                             title = currentScreen.title,
                             onMenuClick = { isDrawerOpen = true }
                         )
                     } else {
-                        // TopBar tradicional para otras pantallas
                         topBarConfig?.let { config ->
                             AppTopBar(config = config)
                         }
@@ -109,7 +101,6 @@ fun RatingRoomApp() {
                 containerColor = Color.Transparent,
                 contentWindowInsets = WindowInsets(0, 0, 0, 0)
             ) { innerPadding ->
-                // Contenido de las pantallas
                 when (currentScreen) {
                     is Login -> {
                         LoginScreen(
@@ -118,14 +109,14 @@ fun RatingRoomApp() {
                             onRegisterClick = { currentScreen = Register }
                         )
                     }
-                    
+
                     is Register -> {
                         RegisterScreen(
                             onRegisterClick = { _, _, _, _, _, _ -> currentScreen = Login },
                             onLoginClick = { currentScreen = Login }
                         )
                     }
-                    
+
                     is ForgotPassword -> {
                         ForgotPasswordScreen(
                             email = forgotPasswordEmail,
@@ -134,7 +125,7 @@ fun RatingRoomApp() {
                             onBackToLoginClick = { currentScreen = Login }
                         )
                     }
-                    
+
                     is MainMenu -> {
                         MainMenuScreen(
                             searchQuery = searchQuery,
@@ -150,7 +141,15 @@ fun RatingRoomApp() {
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
-                    
+
+                    is ListScreen -> {
+                        ListScreen(
+                            selectedTab = selectedListTab,
+                            onTabSelected = { selectedListTab = it },
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                    }
+
                     is EditProfile -> {
                         EditProfileScreen(
                             displayName = displayName,
@@ -170,7 +169,7 @@ fun RatingRoomApp() {
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
-                    
+
                     is MovieDetail -> {
                         selectedMovie?.let { movie ->
                             MovieDetailScreen(
@@ -182,7 +181,7 @@ fun RatingRoomApp() {
                             )
                         }
                     }
-                    
+
                     is Friends -> {
                         FriendsScreen(
                             searchQuery = friendsSearchQuery,
@@ -213,9 +212,8 @@ fun RatingRoomApp() {
                             modifier = Modifier.padding(innerPadding)
                         )
                     }
-                    
+
                     is Favorites -> {
-                        // Implementar pantalla de favoritos
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -225,9 +223,8 @@ fun RatingRoomApp() {
                             Text("Pantalla de Favoritos - En desarrollo")
                         }
                     }
-                    
+
                     is Settings -> {
-                        // Implementar pantalla de configuración
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -245,7 +242,6 @@ fun RatingRoomApp() {
                     }
 
                     is Synopsis -> {
-
                         val movie = selectedMovie
                         if (movie != null) {
                             SynopsisScreen(
@@ -260,15 +256,14 @@ fun RatingRoomApp() {
                 }
             }
 
-            // Navigation Drawer
             if (currentScreen !in Screen.authScreens) {
                 ModernNavigationDrawer(
                     isOpen = isDrawerOpen,
                     onToggle = { isDrawerOpen = !isDrawerOpen },
                     currentScreen = currentScreen,
                     onNavigate = navigateToScreen,
-                    onLogout = { 
-                        currentScreen = Screen.Login
+                    onLogout = {
+                        currentScreen = Login
                         isDrawerOpen = false
                     }
                 )

@@ -9,13 +9,16 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
     object Login : Screen("login", "Iniciar Sesión")
     object Register : Screen("register", "Registrarse")
     object ForgotPassword : Screen("forgot_password", "Recuperar Contraseña")
-    
+
     // Pantallas principales
     object MainMenu : Screen("main_menu", "Inicio", Icons.Default.Home)
     object EditProfile : Screen("edit_profile", "Mi Perfil", Icons.Default.Person)
+    // Pantalla de lista personalizada: título "Mi Lista" y icono Flag
+    object ListScreen : Screen("list", "Mi Lista", Icons.Default.Flag)
     object Friends : Screen("friends", "Amigos", Icons.Default.People)
     object Favorites : Screen("favorites", "Favoritos", Icons.Default.Favorite)
     object Settings : Screen("settings", "Configuración", Icons.Default.Settings)
+
 
     object MyReviews : Screen("my_reviews", "Mis Reseñas", Icons.Default.RateReview)
 
@@ -23,24 +26,27 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
     data class MovieDetail(val movieId: String) : Screen("movie_detail/$movieId", "Detalle de Película")
 
     data class Synopsis(val movieId: String) : Screen("synopsis/$movieId", "Sinopsis")
+
     companion object {
         // Lista de pantallas principales para el drawer
+        // Orden: MainMenu, EditProfile, ListScreen ("Mi Lista"), Friends, Favorites, Settings
         val mainScreens = listOf(
             MainMenu,
             EditProfile,
+            ListScreen,
             Friends,
             Favorites,
             MyReviews,
             Settings
         )
-        
+
         // Lista de pantallas de autenticación
         val authScreens = listOf(
             Login,
             Register,
             ForgotPassword
         )
-        
+
         // Función para obtener pantalla por ruta
         fun fromRoute(route: String): Screen? {
             return when {
@@ -52,6 +58,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector?
                 route == Friends.route -> Friends
                 route == Favorites.route -> Favorites
                 route == Settings.route -> Settings
+                route == ListScreen.route -> ListScreen
                 route == MyReviews.route -> MyReviews
                 route.startsWith("movie_detail/") -> {
                     val movieId = route.substringAfter("movie_detail/")
