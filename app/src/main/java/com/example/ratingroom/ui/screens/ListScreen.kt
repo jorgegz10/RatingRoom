@@ -24,95 +24,96 @@ import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.MovieCard
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScreen(
-    selectedTab: Int,
-    onTabSelected: (Int) -> Unit,
+    onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var selectedTab by remember { mutableStateOf(0) }
+    
     Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-        // Header con estadísticas
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF1A1A2E),
-                            Color(0xFF16213E)
-                        )
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF1976D2),
+                        Color(0xFF42A5F5)
                     )
                 )
-                .padding(16.dp)
+            )
+    ) {
+        // Header con estadísticas
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = Color.Transparent
         ) {
-            // Estadísticas
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Stats(
-                    number = "1",
-                    label = "Por ver",
-                    modifier = Modifier.weight(1f)
-                )
-
-                Stats(
-                    number = "2",
-                    label = "Favoritos",
-                    modifier = Modifier.weight(1f)
-                )
-
-                Stats(
-                    number = "1",
-                    label = "Vistos",
-                    modifier = Modifier.weight(1f)
-                )
+                Stats(number = "12", label = "Por ver")
+                Stats(number = "8", label = "Favoritos")
+                Stats(number = "45", label = "Vistas")
             }
         }
 
-        // Contenido principal con fondo blanco
+        // Contenido principal con tabs
         Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Color.White,
-            shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f),
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+            color = MaterialTheme.colorScheme.surface
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Tabs horizontales (3 tabs: Por ver, Favoritos, Vistas)
+            Column {
+                // Tab Row
                 ListTabRow(
                     selectedTab = selectedTab,
-                    onTabSelected = onTabSelected
+                    onTabSelected = { selectedTab = it }
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Contenido según la pestaña seleccionada
+                // Contenido de cada tab
                 when (selectedTab) {
                     0 -> {
                         // Por ver: mostrar una película (ejemplo id=1)
                         val movie = remember { MovieRepository.getMovieById(1) }
                         movie?.let {
-                            MovieList(items = listOf(it))
+                            MovieList(
+                                items = listOf(it),
+                                onMovieClick = onMovieClick
+                            )
                         } ?: EmptyTabContent(tabIndex = 0, modifier = Modifier.fillMaxSize())
                     }
                     1 -> {
                         // Favoritos: mostrar dos películas distintas (ejemplo id=2 y id=3)
-                        val favorites = remember { listOfNotNull(MovieRepository.getMovieById(2), MovieRepository.getMovieById(3)) }
-                        if (favorites.isEmpty()) EmptyTabContent(tabIndex = 1, modifier = Modifier.fillMaxSize()) else MovieList(items = favorites)
+                        val favorites = remember { 
+                            listOfNotNull(
+                                MovieRepository.getMovieById(2), 
+                                MovieRepository.getMovieById(3)
+                            ) 
+                        }
+                        if (favorites.isEmpty()) {
+                            EmptyTabContent(tabIndex = 1, modifier = Modifier.fillMaxSize())
+                        } else {
+                            MovieList(
+                                items = favorites,
+                                onMovieClick = onMovieClick
+                            )
+                        }
                     }
                     2 -> {
                         // Vistos: mostrar una película diferente (ejemplo id=4)
                         val seen = remember { MovieRepository.getMovieById(4) }
-                        seen?.let { MovieList(items = listOf(it)) } ?: EmptyTabContent(tabIndex = 2, modifier = Modifier.fillMaxSize())
+                        seen?.let { 
+                            MovieList(
+                                items = listOf(it),
+                                onMovieClick = onMovieClick
+                            )
+                        } ?: EmptyTabContent(tabIndex = 2, modifier = Modifier.fillMaxSize())
                     }
                     else -> EmptyTabContent(tabIndex = 0, modifier = Modifier.fillMaxSize())
                 }
@@ -181,14 +182,20 @@ fun ListTabRow(
 }
 
 @Composable
-fun MovieList(items: List<Movie>, modifier: Modifier = Modifier) {
+fun MovieList(
+    items: List<Movie>, 
+    onMovieClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = modifier
+        modifier = modifier.padding(16.dp)
     ) {
         items(items) { movie ->
-            // Usamos la MovieCard que ya tienes en ui.utils
-            MovieCard(movie = movie, onClick = { })
+            MovieCard(
+                movie = movie, 
+                onClick = { onMovieClick(movie.id) }
+            )
         }
     }
 }
@@ -214,21 +221,21 @@ fun EmptyTabContent(tabIndex: Int, modifier: Modifier = Modifier) {
             modifier = Modifier.size(64.dp),
             tint = cs.onSurfaceVariant
         )
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(text = message, fontSize = 18.sp, color = cs.onSurfaceVariant)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "Agrega elementos para que aparezcan aquí", fontSize = 14.sp, color = cs.onSurfaceVariant)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = message,
+            color = cs.onSurfaceVariant,
+            fontSize = 16.sp
+        )
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewListScreen() {
-    var tab by remember { mutableStateOf(0) }
     RatingRoomTheme {
         ListScreen(
-            selectedTab = tab,
-            onTabSelected = { tab = it },
+            onMovieClick = { /* Preview */ }
         )
     }
 }

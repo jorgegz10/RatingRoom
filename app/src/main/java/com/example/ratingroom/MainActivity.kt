@@ -91,16 +91,20 @@ fun RatingRoomApp() {
     }
     
     // Determinar pantalla actual para configuraciones
-    val currentScreen = when (currentRoute) {
-        Screen.Login.route -> Screen.Login
-        Screen.Register.route -> Screen.Register
-        Screen.ForgotPassword.route -> Screen.ForgotPassword
-        Screen.MainMenu.route -> Screen.MainMenu
-        Screen.EditProfile.route -> Screen.EditProfile
-        Screen.Friends.route -> Screen.Friends
-        Screen.Favorites.route -> Screen.Favorites
-        Screen.Settings.route -> Screen.Settings
-        else -> if (currentRoute?.startsWith("movie_detail/") == true) Screen.MovieDetail else Screen.MainMenu
+    val currentScreen = when {
+        currentRoute == Screen.Login.route -> Screen.Login
+        currentRoute == Screen.Register.route -> Screen.Register
+        currentRoute == Screen.ForgotPassword.route -> Screen.ForgotPassword
+        currentRoute == Screen.MainMenu.route -> Screen.MainMenu
+        currentRoute == Screen.EditProfile.route -> Screen.EditProfile
+        currentRoute == Screen.Friends.route -> Screen.Friends
+        currentRoute == Screen.Favorites.route -> Screen.Favorites
+        currentRoute == Screen.Settings.route -> Screen.Settings
+        currentRoute == Screen.List.route -> Screen.List
+        currentRoute == Screen.Reviews.route -> Screen.Reviews
+        currentRoute?.startsWith("movie_detail/") == true -> Screen.MovieDetail
+        currentRoute?.startsWith("synopsis/") == true -> Screen.Synopsis
+        else -> Screen.MainMenu
     }
     
     // Configuración de TopBar
@@ -130,7 +134,7 @@ fun RatingRoomApp() {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
-                    if (currentScreen in listOf(Screen.MainMenu, Screen.Friends) && currentScreen !in Screen.authScreens) {
+                    if (currentScreen in listOf(Screen.MainMenu, Screen.Friends, Screen.List, Screen.Reviews) && currentScreen !in Screen.authScreens) {
                         ModernTopBar(
                             title = currentScreen.title,
                             onMenuClick = { isDrawerOpen = true }
@@ -191,7 +195,7 @@ fun RatingRoomApp() {
                             onFilterExpandedChange = { filterExpanded = it },
                             onMovieClick = { id ->
                                 Log.d("Ayuda", "$id")
-                                navController.navigate(Screen.MovieDetail.createRoute(id))
+                                navigateToScreen(Screen.MovieDetail.createRoute(id))
                             }
                         )
                     }
@@ -263,10 +267,25 @@ fun RatingRoomApp() {
                         }
                     }
                     
+                    // Nueva pantalla de Lista
+                    composable(Screen.List.route) {
+                        ListScreen(
+                            onMovieClick = { movieId ->
+                                navigateToScreen(Screen.MovieDetail.createRoute(movieId))
+                            }
+                        )
+                    }
+                    
+                    // Nueva pantalla de Reviews
+                    composable(Screen.Reviews.route) {
+                        ReviewsScreen(
+                            onBack = navigateBack
+                        )
+                    }
+                    
                     // Pantalla de detalle con parámetros
-                    // En la sección del composable de MovieDetail, cambiar:
                     composable(
-                        route = "movie_detail/{movieId}",
+                        route = Screen.MovieDetail.route,
                         arguments = listOf(
                             navArgument("movieId") { 
                                 type = NavType.IntType
@@ -274,16 +293,34 @@ fun RatingRoomApp() {
                         )
                     ) { backStackEntry ->
                         val movieId = backStackEntry.arguments?.getInt("movieId")
-
                         val movie = MovieRepository.getMovieById(movieId!!)
 
+                        MovieDetailScreen(
+                            movie = movie!!,
+                            onShowMore = { 
+                                // Navegar a Synopsis con el ID de la película
+                                navigateToScreen(Screen.Synopsis.createRoute(movieId))
+                            },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    
+                    // Nueva pantalla de Synopsis
+                    composable(
+                        route = Screen.Synopsis.route,
+                        arguments = listOf(
+                            navArgument("movieId") { 
+                                type = NavType.IntType
+                            }
+                        )
+                    ) { backStackEntry ->
+                        val movieId = backStackEntry.arguments?.getInt("movieId")
+                        val movie = MovieRepository.getMovieById(movieId!!)
 
-                            MovieDetailScreen(
-                                movie = movie!!,
-                                onShowMore = { /* Acción para mostrar más detalles */ },
-                                modifier = Modifier.fillMaxSize()
-                            )
-
+                        SynopsisScreen(
+                            movie = movie!!,
+                            onBackClick = navigateBack
+                        )
                     }
                 }
             }

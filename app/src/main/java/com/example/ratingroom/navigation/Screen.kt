@@ -4,7 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
- public sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
+public sealed class Screen(val route: String, val title: String, val icon: ImageVector? = null) {
     // Pantallas de autenticación
     object Login : Screen("login", "Iniciar Sesión")
     object Register : Screen("register", "Registrarse")
@@ -22,10 +22,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
         fun createRoute(movieId: Int) = "movie_detail/$movieId"
     }
     
+    // Nuevas pantallas
+    object Synopsis : Screen("synopsis/{movieId}", "Sinopsis") {
+        fun createRoute(movieId: Int) = "synopsis/$movieId"
+    }
+    
+    object Reviews : Screen("reviews", "Mis Reseñas", Icons.Default.RateReview)
+    
+    object List : Screen("list", "Lista de Películas", Icons.Default.List)
+    
     companion object {
         // Lista de pantallas principales para el drawer
         val mainScreens = listOf(
             MainMenu,
+            List,
+            Reviews,
             EditProfile,
             Friends,
             Favorites,
