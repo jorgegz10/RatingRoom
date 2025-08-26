@@ -30,6 +30,7 @@ fun ForgotPasswordScreen(
     onBackToLoginClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
     var showHowItWorks by remember { mutableStateOf(false) }
     val cs = MaterialTheme.colorScheme
 
