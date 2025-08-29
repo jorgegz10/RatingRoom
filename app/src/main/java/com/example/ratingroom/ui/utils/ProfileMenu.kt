@@ -27,7 +27,7 @@ fun ProfileMenu(
             modifier = Modifier
                 .padding(end = 16.dp)
                 .size(32.dp)
-                .background(Color.White, CircleShape)
+                .background(MaterialTheme.colorScheme.surface, CircleShape)
                 .clickable { onExpandedChange(true) },
             contentAlignment = Alignment.Center
         ) {}

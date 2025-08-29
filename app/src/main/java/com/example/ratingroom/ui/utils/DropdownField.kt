@@ -5,10 +5,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratingroom.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,17 +18,19 @@ fun DropdownField(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    
+
+    val c = MaterialTheme.colorScheme
+
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
             text = label,
             fontSize = 14.sp,
-            color = colorResource(id = R.color.black),
+            color = c.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        
+
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }
@@ -46,8 +46,8 @@ fun DropdownField(
                     .menuAnchor()
                     .fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(id = R.color.primary_blue),
-                    unfocusedBorderColor = colorResource(id = R.color.light_gray)
+                    focusedBorderColor = c.primary,
+                    unfocusedBorderColor = c.outline
                 ),
                 shape = RoundedCornerShape(8.dp)
             )

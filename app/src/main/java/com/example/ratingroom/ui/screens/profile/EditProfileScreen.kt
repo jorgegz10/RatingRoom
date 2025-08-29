@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -6,7 +6,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.R
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.*
@@ -23,32 +25,72 @@ import com.example.ratingroom.ui.utils.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
-    displayName: String,
+    onSave: () -> Unit,
+    onBackClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: EditProfileViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    EditProfileScreenContent(
+        uiState = uiState,
+        onDisplayNameChange = viewModel::onDisplayNameChange,
+        onEmailChange = viewModel::onEmailChange,
+        onBiographyChange = viewModel::onBiographyChange,
+        onLocationChange = viewModel::onLocationChange,
+        onFavoriteGenreChange = viewModel::onFavoriteGenreChange,
+        onBirthdateChange = viewModel::onBirthdateChange,
+        onWebsiteChange = viewModel::onWebsiteChange,
+        onSave = {
+            viewModel.saveProfile()
+            onSave()
+        },
+        onBackClick = onBackClick,
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditProfileScreenContent(
+    uiState: EditProfileUIState,
     onDisplayNameChange: (String) -> Unit,
-    email: String,
     onEmailChange: (String) -> Unit,
-    biography: String,
     onBiographyChange: (String) -> Unit,
-    location: String,
     onLocationChange: (String) -> Unit,
-    favoriteGenre: String,
     onFavoriteGenreChange: (String) -> Unit,
-    birthdate: String,
     onBirthdateChange: (String) -> Unit,
-    website: String,
     onWebsiteChange: (String) -> Unit,
+    onSave: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val genres = listOf("Sci-Fi", "Acción", "Drama", "Comedia", "Terror", "Romance")
     val cs = MaterialTheme.colorScheme
 
-    GradientBackground {  // <— fondo azul degradado
+    GradientBackground {
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
+            // Header SOLO con flecha atrás (SIN LOGO)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(id = R.string.content_desc_back),
+                        tint = cs.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
             // FOTO DE PERFIL
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -60,39 +102,35 @@ fun EditProfileScreen(
                 ) {
                     Surface(
                         shape = CircleShape,
-                        color = cs.surfaceVariant,                    // antes: Color.LightGray
+                        color = cs.surfaceVariant,
                         modifier = Modifier.size(100.dp)
-                    ) {
-                        Box(Modifier.fillMaxSize())
-                    }
+                    ) { Box(Modifier.fillMaxSize()) }
                     IconButton(
                         onClick = {},
                         modifier = Modifier
                             .size(32.dp)
-                            .background(cs.primary, CircleShape)       // antes: Color.Black
+                            .background(cs.primary, CircleShape)
                     ) {
                         Icon(
-                            Icons.Default.CameraAlt,
+                            Icons.Filled.CameraAlt,
                             contentDescription = stringResource(id = R.string.change_photo),
-                            tint = cs.onPrimary                         // antes: Color.White
+                            tint = cs.onPrimary
                         )
                     }
                 }
                 Text(
                     stringResource(id = R.string.change_photo_hint),
                     fontSize = 12.sp,
-                    color = cs.onPrimary                               // antes: Color.White (mantiene look)
+                    color = cs.onPrimary
                 )
             }
 
             Spacer(Modifier.height(24.dp))
 
             // INFORMACIÓN PERSONAL
-            SectionCard(
-                title = stringResource(id = R.string.personal_info_title)
-            ) {
+            SectionCard(title = stringResource(id = R.string.personal_info_title)) {
                 TextInputField(
-                    value = displayName,
+                    value = uiState.displayName,
                     onValueChange = onDisplayNameChange,
                     label = stringResource(id = R.string.display_name_label),
                     placeholder = stringResource(id = R.string.display_name_placeholder)
@@ -101,7 +139,7 @@ fun EditProfileScreen(
                 Spacer(Modifier.height(16.dp))
 
                 EmailField(
-                    value = email,
+                    value = uiState.email,
                     onValueChange = onEmailChange,
                     label = stringResource(id = R.string.email_label),
                     placeholder = stringResource(id = R.string.email_placeholder)
@@ -110,7 +148,7 @@ fun EditProfileScreen(
                 Spacer(Modifier.height(16.dp))
 
                 TextInputField(
-                    value = biography,
+                    value = uiState.biography,
                     onValueChange = onBiographyChange,
                     label = stringResource(id = R.string.biography_label),
                     placeholder = stringResource(id = R.string.biography_placeholder)
@@ -119,7 +157,7 @@ fun EditProfileScreen(
                 Spacer(Modifier.height(16.dp))
 
                 TextInputField(
-                    value = location,
+                    value = uiState.location,
                     onValueChange = onLocationChange,
                     label = stringResource(id = R.string.location_label),
                     placeholder = stringResource(id = R.string.location_placeholder)
@@ -129,11 +167,9 @@ fun EditProfileScreen(
             Spacer(Modifier.height(16.dp))
 
             // PREFERENCIAS
-            SectionCard(
-                title = stringResource(id = R.string.preferences_title)
-            ) {
+            SectionCard(title = stringResource(id = R.string.preferences_title)) {
                 DropdownField(
-                    value = favoriteGenre,
+                    value = uiState.favoriteGenre,
                     onValueChange = onFavoriteGenreChange,
                     label = stringResource(id = R.string.favorite_genre_label),
                     options = genres
@@ -142,7 +178,7 @@ fun EditProfileScreen(
                 Spacer(Modifier.height(16.dp))
 
                 DatePickerField(
-                    value = birthdate,
+                    value = uiState.birthdate,
                     onValueChange = onBirthdateChange,
                     label = stringResource(id = R.string.birthdate_label)
                 )
@@ -150,7 +186,7 @@ fun EditProfileScreen(
                 Spacer(Modifier.height(16.dp))
 
                 TextInputField(
-                    value = website,
+                    value = uiState.website,
                     onValueChange = onWebsiteChange,
                     label = stringResource(id = R.string.website_label),
                     placeholder = stringResource(id = R.string.website_placeholder),
@@ -162,9 +198,9 @@ fun EditProfileScreen(
 
             CustomButton(
                 text = stringResource(id = R.string.save_changes),
-                onClick = { /* Guardar cambios */ },
-                backgroundColor = cs.primary,                           // antes: Color.Black
-                textColor = cs.onPrimary,                               // antes: Color.White
+                onClick = onSave,
+                backgroundColor = cs.primary,
+                textColor = cs.onPrimary,
                 modifier = Modifier.height(56.dp)
             )
         }
@@ -175,21 +211,25 @@ fun EditProfileScreen(
 @Composable
 fun PreviewEditProfileScreen() {
     RatingRoomTheme {
-        EditProfileScreen(
-            displayName = "",
+        EditProfileScreenContent(
+            uiState = EditProfileUIState(
+                displayName = "Pedro",
+                email = "pedro@correo.com",
+                biography = "Amante del cine y las buenas historias.",
+                location = "Madrid, España",
+                favoriteGenre = "Sci-Fi",
+                birthdate = "15/03/1990",
+                website = "https://miweb.com"
+            ),
             onDisplayNameChange = {},
-            email = "",
             onEmailChange = {},
-            biography = "",
             onBiographyChange = {},
-            location = "",
             onLocationChange = {},
-            favoriteGenre = "Género Favorito",
             onFavoriteGenreChange = {},
-            birthdate = "mm / dd / yyyy",
             onBirthdateChange = {},
-            website = "",
-            onWebsiteChange = {}
+            onWebsiteChange = {},
+            onSave = {},
+            onBackClick = {}
         )
     }
 }

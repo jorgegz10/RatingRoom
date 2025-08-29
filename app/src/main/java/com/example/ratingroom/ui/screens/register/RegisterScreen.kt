@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.register
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.R
 import com.example.ratingroom.ui.theme.*
 import com.example.ratingroom.ui.utils.*
@@ -27,15 +28,51 @@ fun RegisterScreen(
     onRegisterClick: (String, String, String, String, String, String) -> Unit = { _, _, _, _, _, _ -> },
     onLoginClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: RegisterViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    RegisterScreenContent(
+        uiState = uiState,
+        onFullNameChange = viewModel::onFullNameChange,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+        onFavoriteGenreChange = viewModel::onFavoriteGenreChange,
+        onBirthYearChange = viewModel::onBirthYearChange,
+        onAcceptTermsChange = viewModel::onAcceptTermsChange,
+        onRegisterClick = {
+            onRegisterClick(
+                uiState.fullName,
+                uiState.email,
+                uiState.password,
+                uiState.confirmPassword,
+                uiState.favoriteGenre,
+                uiState.birthYear
+            )
+        },
+        onLoginClick = onLoginClick,
+        onBackClick = onBackClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun RegisterScreenContent(
+    uiState: RegisterUIState,
+    onFullNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onConfirmPasswordChange: (String) -> Unit,
+    onFavoriteGenreChange: (String) -> Unit,
+    onBirthYearChange: (String) -> Unit,
+    onAcceptTermsChange: (Boolean) -> Unit,
+    onRegisterClick: () -> Unit,
+    onLoginClick: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var fullName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-    var favoriteGenre by remember { mutableStateOf("") }
-    var birthYear by remember { mutableStateOf("") }
-    var acceptTerms by remember { mutableStateOf(false) }
 
     val cs = MaterialTheme.colorScheme
 
@@ -98,8 +135,8 @@ fun RegisterScreen(
 
                 // Campo de nombre completo
                 TextInputField(
-                    value = fullName,
-                    onValueChange = { fullName = it },
+                    value = uiState.fullName,
+                    onValueChange = onFullNameChange,
                     label = stringResource(id = R.string.field_full_name),
                     placeholder = stringResource(id = R.string.field_full_name_placeholder)
                 )
@@ -108,24 +145,24 @@ fun RegisterScreen(
 
                 // Campo de email
                 EmailField(
-                    value = email,
-                    onValueChange = { email = it }
+                    value = uiState.email,
+                    onValueChange = onEmailChange
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Campo de contraseña
                 PasswordField(
-                    value = password,
-                    onValueChange = { password = it }
+                    value = uiState.password,
+                    onValueChange = onPasswordChange
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Campo de confirmar contraseña
                 PasswordField(
-                    value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
+                    value = uiState.confirmPassword,
+                    onValueChange = onConfirmPasswordChange,
                     label = stringResource(id = R.string.field_confirm_password),
                     placeholder = stringResource(id = R.string.field_confirm_password_placeholder)
                 )
@@ -134,8 +171,8 @@ fun RegisterScreen(
 
                 // Campo de género favorito (opcional)
                 TextInputField(
-                    value = favoriteGenre,
-                    onValueChange = { favoriteGenre = it },
+                    value = uiState.favoriteGenre,
+                    onValueChange = onFavoriteGenreChange,
                     label = stringResource(id = R.string.field_favorite_genre),
                     placeholder = stringResource(id = R.string.field_favorite_genre_placeholder)
                 )
@@ -144,8 +181,8 @@ fun RegisterScreen(
 
                 // Campo de año de nacimiento (opcional)
                 TextInputField(
-                    value = birthYear,
-                    onValueChange = { birthYear = it },
+                    value = uiState.birthYear,
+                    onValueChange = onBirthYearChange,
                     label = stringResource(id = R.string.field_birth_year),
                     placeholder = stringResource(id = R.string.field_birth_year_placeholder),
                     keyboardType = KeyboardType.Number
@@ -159,8 +196,8 @@ fun RegisterScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
-                        checked = acceptTerms,
-                        onCheckedChange = { acceptTerms = it },
+                        checked = uiState.acceptTerms,
+                    onCheckedChange = onAcceptTermsChange,
                         colors = CheckboxDefaults.colors(
                             checkedColor = cs.primary,
                             uncheckedColor = cs.onSurfaceVariant,
@@ -180,9 +217,7 @@ fun RegisterScreen(
                 // Botón de registro
                 CustomButton(
                     text = stringResource(id = R.string.register_button),
-                    onClick = {
-                        onRegisterClick(fullName, email, password, confirmPassword, favoriteGenre, birthYear)
-                    },
+                    onClick = onRegisterClick,
                     backgroundColor = cs.primary,
                     textColor = cs.onPrimary
                 )
@@ -227,6 +262,26 @@ fun RegisterScreen(
 @Composable
 fun RegisterScreenPreview() {
     RatingRoomTheme {
-        RegisterScreen()
+        RegisterScreenContent(
+            uiState = RegisterUIState(
+                fullName = "",
+                email = "",
+                password = "",
+                confirmPassword = "",
+                favoriteGenre = "",
+                birthYear = "",
+                acceptTerms = false
+            ),
+            onFullNameChange = {},
+            onEmailChange = {},
+            onPasswordChange = {},
+            onConfirmPasswordChange = {},
+            onFavoriteGenreChange = {},
+            onBirthYearChange = {},
+            onAcceptTermsChange = {},
+            onRegisterClick = {},
+            onLoginClick = {},
+            onBackClick = {}
+        )
     }
 }

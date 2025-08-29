@@ -4,19 +4,31 @@
     <string name="app_name">RatingRoom</string>
     
     <!-- Pantalla de Login -->
-    <string name="login_title">Ratingroom</string>
+    <!-- Agregar estas líneas al archivo strings.xml -->
+    <string name="register_have_account">¿Ya tienes cuenta?</string>
+    <string name="register_login_link">Inicia Sesión</string>
+    <string name="register_title">Crear Cuenta</string>
+    <string name="register_subtitle">Únete a la comunidad</string>
+    <string name="register_button">Crear Cuenta</string>
+    
+    <string name="login_title">RatingRoom</string>
     <string name="login_subtitle">Inicia sesión para descubrir y calificar películas</string>
-    <string name="login_button">Iniciar sesión</string>
-    <string name="login_no_account">¿No tienes cuenta? </string>
+    <string name="login_no_account">¿No tienes cuenta?</string>
     <string name="login_register_link">Regístrate aquí</string>
-    <string name="login_demo_text">Disfruta con cualquier email y contraseña</string>
+    <string name="login_button">Iniciar sesión</string>
+    <string name="login_demo_text">Demo: usa cualquier email y contraseña</string>
+    
+    <string name="forgot_password_title">Recuperar Contraseña</string>
+    <string name="forgot_password_subtitle">Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña</string>
+    <string name="forgot_password_send_button">Enviar Enlace</string>
+    <string name="forgot_password_back_to_login">Volver al inicio de sesión</string>
     
     <!-- Pantalla de Registro -->
-    <string name="register_title">Crear Cuenta</string>
-    <string name="register_subtitle">Únete a Ratingroom y descubre películas increíbles</string>
-    <string name="register_button">Crear cuenta</string>
+  
+
+
     <string name="register_has_account">¿Ya tienes cuenta? </string>
-    <string name="register_login_link">Inicia sesión aquí</string>
+
     <string name="register_community_text">Únete a nuestra comunidad de amantes del cine</string>
     <string name="register_terms">Acepto los términos y condiciones</string>
     
@@ -111,15 +123,15 @@
     <string name="correo_electr_nico">Correo electrónico</string>
     
     <!-- STRINGS PARA FORGOT PASSWORD SCREEN -->
-    <string name="forgot_password_title">Recuperar Contraseña</string>
-    <string name="forgot_password_subtitle">Ingresa tu correo electrónico y te enviaremos las instrucciones</string>
+
+
     <string name="forgot_password_email_label">Correo electrónico</string>
     <string name="forgot_password_email_placeholder">tu@correo.com</string>
     <string name="forgot_password_how_it_works">¿Cómo funciona?</string>
     <string name="forgot_password_explanation">Te enviaremos un enlace seguro a tu correo electrónico. Haz clic en el enlace para crear una nueva contraseña.</string>
-    <string name="forgot_password_send_button">Enviar enlace de recuperación</string>
+
     <string name="forgot_password_remember">¿Recordaste tu contraseña?</string>
-    <string name="forgot_password_back_to_login">Volver al inicio de sesión</string>
+
     <string name="forgot_password_demo_text">Demo: Cualquier email válido funcionará</string>
     
     <!-- STRINGS PARA FRIENDS SCREEN -->
@@ -142,4 +154,13 @@
     <string name="friends_no_following">No sigues a nadie</string>
     <string name="friends_no_followers">No tienes seguidores</string>
     <string name="friends_add_first_friend">¡Agrega tu primer amigo!</string>
+    
+    <!-- STRINGS ADICIONALES PARA CORREGIR ERRORES -->
+    <string name="show_how_it_works">¿Cómo funciona?</string>
+    <string name="email">Email</string>
+    <string name="full_name">Nombre completo</string>
+    <string name="favorite_genre">Género favorito</string>
+    <string name="birth_year">Año de nacimiento</string>
+    <string name="accept_terms">Acepto los términos</string>
+    
 </resources>

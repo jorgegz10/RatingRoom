@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.R
 import com.example.ratingroom.ui.theme.*
 import com.example.ratingroom.ui.utils.*
@@ -22,10 +23,32 @@ fun LoginScreen(
     onLoginClick: (String, String) -> Unit = { _, _ -> },
     onRegisterClick: () -> Unit = {},
     onForgotPasswordClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    LoginScreenContent(
+        uiState = uiState,
+        onEmailChange = viewModel::onUsernameChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onLoginClick = { onLoginClick(uiState.username, uiState.password) },
+        onRegisterClick = onRegisterClick,
+        onForgotPasswordClick = onForgotPasswordClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun LoginScreenContent(
+    uiState: LoginUIState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
+    onRegisterClick: () -> Unit,
+    onForgotPasswordClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
 
     // Colores desde tu paleta MD3 (se ve igual pero ahora responde al tema claro/oscuro)
     val onSurface = MaterialTheme.colorScheme.onSurface
@@ -72,16 +95,16 @@ fun LoginScreen(
 
                 // Campo de email
                 EmailField(
-                    value = email,
-                    onValueChange = { email = it }
+                    value = uiState.username,
+                    onValueChange = onEmailChange
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Campo de contraseña
                 PasswordField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = uiState.password,
+                    onValueChange = onPasswordChange,
                     showForgotPassword = true,
                     onForgotPasswordClick = onForgotPasswordClick
                 )
@@ -91,7 +114,7 @@ fun LoginScreen(
                 // Botón de iniciar sesión
                 CustomButton(
                     text = stringResource(id = R.string.login_button),
-                    onClick = { onLoginClick(email, password) }
+                    onClick = onLoginClick
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -136,6 +159,16 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     RatingRoomTheme {
-        LoginScreen()
+        LoginScreenContent(
+            uiState = LoginUIState(
+                username = "",
+                password = ""
+            ),
+            onEmailChange = {},
+            onPasswordChange = {},
+            onLoginClick = {},
+            onRegisterClick = {},
+            onForgotPasswordClick = {}
+        )
     }
 }

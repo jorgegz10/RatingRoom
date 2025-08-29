@@ -3,9 +3,10 @@ package com.example.ratingroom.data.repository
 import com.example.ratingroom.data.models.Movie
 import com.example.ratingroom.data.models.Review
 import com.example.ratingroom.data.models.User
+import com.example.ratingroom.R
 
 object MovieRepository {
-    
+
     private val movies = listOf(
         Movie(
             id = 1,
@@ -16,7 +17,8 @@ object MovieRepository {
             reviews = 3876,
             description = "Una épica historia de amor ambientada en el trágico viaje del Titanic.",
             director = "James Cameron",
-            duration = "3h 14min"
+            duration = "3h 14min",
+            imageRes = R.drawable.titanic
         ),
         Movie(
             id = 2,
@@ -27,7 +29,8 @@ object MovieRepository {
             reviews = 3421,
             description = "Historias entrelazadas de crimen en Los Ángeles.",
             director = "Quentin Tarantino",
-            duration = "2h 34min"
+            duration = "2h 34min",
+            imageRes = R.drawable.pulp_fiction
         ),
         Movie(
             id = 3,
@@ -38,7 +41,8 @@ object MovieRepository {
             reviews = 2987,
             description = "Batman enfrenta al Joker en Gotham City.",
             director = "Christopher Nolan",
-            duration = "2h 32min"
+            duration = "2h 32min",
+            imageRes = R.drawable.dark_knight
         ),
         Movie(
             id = 4,
@@ -49,7 +53,8 @@ object MovieRepository {
             reviews = 2987,
             description = "Un marine parapléjico es enviado a la luna Pandora.",
             director = "James Cameron",
-            duration = "2h 42min"
+            duration = "2h 42min",
+            imageRes = R.drawable.avatar
         ),
         Movie(
             id = 5,
@@ -60,7 +65,8 @@ object MovieRepository {
             reviews = 2654,
             description = "Dinosaurios clonados en un parque temático.",
             director = "Steven Spielberg",
-            duration = "2h 7min"
+            duration = "2h 7min",
+            imageRes = R.drawable.jurassic_park
         ),
         Movie(
             id = 6,
@@ -71,7 +77,8 @@ object MovieRepository {
             reviews = 2234,
             description = "La historia de Henry Hill y la mafia italiana.",
             director = "Martin Scorsese",
-            duration = "2h 26min"
+            duration = "2h 26min",
+            imageRes = R.drawable.goodfellas
         ),
         Movie(
             id = 7,
@@ -82,7 +89,8 @@ object MovieRepository {
             reviews = 4521,
             description = "Un ladrón que roba secretos del subconsciente.",
             director = "Christopher Nolan",
-            duration = "2h 28min"
+            duration = "2h 28min",
+            imageRes = R.drawable.inception
         ),
         Movie(
             id = 8,
@@ -93,10 +101,11 @@ object MovieRepository {
             reviews = 5432,
             description = "La amistad entre dos prisioneros a lo largo de los años.",
             director = "Frank Darabont",
-            duration = "2h 22min"
+            duration = "2h 22min",
+            imageRes = R.drawable.shawshank_redemption
         )
     )
-    
+
     private val users = listOf(
         User(
             id = 1,
@@ -107,7 +116,7 @@ object MovieRepository {
             favoriteGenre = "Sci-Fi"
         )
     )
-    
+
     private val reviews = listOf(
         Review(
             id = 1,
@@ -126,26 +135,38 @@ object MovieRepository {
             date = "2024-01-10"
         )
     )
-    
+
     fun getAllMovies(): List<Movie> = movies
-    
+
     fun getMoviesByGenre(genre: String): List<Movie> {
         return if (genre == "Todos") movies else movies.filter { it.genre == genre }
     }
-    
+
     fun searchMovies(query: String): List<Movie> {
-        return movies.filter { 
+        return movies.filter {
             it.title.contains(query, ignoreCase = true) ||
-            it.director.contains(query, ignoreCase = true) ||
-            it.genre.contains(query, ignoreCase = true)
+                    it.director.contains(query, ignoreCase = true) ||
+                    it.genre.contains(query, ignoreCase = true)
         }
     }
-    
+
     fun getMovieById(id: Int): Movie? = movies.find { it.id == id }
-    
+
     fun getGenres(): List<String> = listOf("Todos", "Romance", "Crime", "Action", "Sci-Fi", "Adventure", "Drama")
-    
+
     fun getUserById(id: Int): User? = users.find { it.id == id }
-    
+
     fun getReviewsForMovie(movieId: Int): List<Review> = reviews.filter { it.movieId == movieId }
+
+    fun getWatchLaterMovies(): List<Movie> {
+        return movies.take(2)
+    }
+
+    fun getFavoriteMovies(): List<Movie> {
+        return movies.filter { it.rating >= 4.7 }
+    }
+
+    fun getWatchedMovies(): List<Movie> {
+        return movies.takeLast(3)
+    }
 }

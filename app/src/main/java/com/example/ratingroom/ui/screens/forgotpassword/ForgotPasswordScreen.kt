@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.forgotpassword
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -18,20 +18,39 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.R
 import com.example.ratingroom.ui.theme.*
 import com.example.ratingroom.ui.utils.*
 
 @Composable
 fun ForgotPasswordScreen(
-    email: String,
-    onEmailChange: (String) -> Unit,
     onSendRecoveryClick: (String) -> Unit,
     onBackToLoginClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ForgotPasswordViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    ForgotPasswordScreenContent(
+        uiState = uiState,
+        onEmailChange = viewModel::onEmailChange,
+        onSendRecoveryClick = { onSendRecoveryClick(uiState.email) },
+        onBackToLoginClick = onBackToLoginClick,
+        onShowHowItWorksChange = viewModel::onShowHowItWorksChange,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ForgotPasswordScreenContent(
+    uiState: ForgotPasswordUIState,
+    onEmailChange: (String) -> Unit,
+    onSendRecoveryClick: () -> Unit,
+    onBackToLoginClick: () -> Unit,
+    onShowHowItWorksChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
-    var showHowItWorks by remember { mutableStateOf(false) }
     val cs = MaterialTheme.colorScheme
 
     GradientBackground {
@@ -91,7 +110,7 @@ fun ForgotPasswordScreen(
 
                 // Campo de email
                 EmailField(
-                    value = email,
+                    value = uiState.email,
                     onValueChange = onEmailChange,
                     label = stringResource(id = R.string.forgot_password_email_label),
                     placeholder = stringResource(id = R.string.forgot_password_email_placeholder)
@@ -104,7 +123,7 @@ fun ForgotPasswordScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
                         containerColor = cs.surfaceVariant.copy(
-                            alpha = if (showHowItWorks) 1f else 0.5f
+                            alpha = if (uiState.showHowItWorks) 1f else 0.5f
                         )
                     )
                 ) {
@@ -132,7 +151,7 @@ fun ForgotPasswordScreen(
                             )
                         }
 
-                        if (showHowItWorks) {
+                        if (uiState.showHowItWorks) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = stringResource(id = R.string.forgot_password_explanation),
@@ -146,11 +165,11 @@ fun ForgotPasswordScreen(
 
                 // Toggle mostrar/ocultar explicación
                 TextButton(
-                    onClick = { showHowItWorks = !showHowItWorks },
+                    onClick = { onShowHowItWorksChange(!uiState.showHowItWorks) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = if (showHowItWorks) "Ocultar" else "Mostrar detalles",
+                        text = if (uiState.showHowItWorks) "Ocultar" else "Mostrar detalles",
                         fontSize = 12.sp,
                         color = cs.primary
                     )
@@ -161,7 +180,7 @@ fun ForgotPasswordScreen(
                 // Botón de enviar
                 CustomButton(
                     text = stringResource(id = R.string.forgot_password_send_button),
-                    onClick = { onSendRecoveryClick(email) },
+                    onClick = onSendRecoveryClick,
                     backgroundColor = cs.primary,
                     textColor = cs.onPrimary,
                     modifier = Modifier.height(56.dp)
@@ -209,11 +228,15 @@ fun ForgotPasswordScreen(
 @Composable
 fun ForgotPasswordScreenPreview() {
     RatingRoomTheme {
-        ForgotPasswordScreen(
-            email = "",
+        ForgotPasswordScreenContent(
+            uiState = ForgotPasswordUIState(
+                email = "",
+                showHowItWorks = false
+            ),
             onEmailChange = {},
             onSendRecoveryClick = {},
-            onBackToLoginClick = {}
+            onBackToLoginClick = {},
+            onShowHowItWorksChange = {}
         )
     }
 }

@@ -10,7 +10,7 @@ data class Movie(
     val description: String,
     val director: String,
     val duration: String,
-    val imageUrl: String? = null,
+    val imageRes: Int? = null,
     val isFavorite: Boolean = false
 )
 

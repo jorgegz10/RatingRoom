@@ -7,7 +7,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,6 +19,7 @@ fun StarRating(
     showText: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val c = MaterialTheme.colorScheme
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
@@ -28,7 +28,7 @@ fun StarRating(
             Icon(
                 Icons.Default.Star,
                 contentDescription = null,
-                tint = if (index < rating) Color(0xFFFFD700) else Color.LightGray,
+                tint = if (index < rating) c.tertiary else c.onSurfaceVariant,
                 modifier = Modifier.size(starSize)
             )
         }
@@ -37,7 +37,7 @@ fun StarRating(
             Text(
                 text = "$rating/$maxRating",
                 fontSize = 12.sp,
-                color = Color.Gray
+                color = c.onSurfaceVariant
             )
         }
     }
