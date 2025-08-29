@@ -239,11 +239,11 @@ data class MainMenuUIState(
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## 👨‍💻 Autor
+## 👨‍💻 Autores
 
-**Tu Nombre**
-- GitHub: [@tu-usuario](https://github.com/tu-usuario)
-- Email: tu-email@ejemplo.com
+**David Piñeros**
+- GitHub: [@DavidSP12](https://github.com/DavidSP12)
+- Email: dpineros05@gmail.com
 
 ## 🙏 Agradecimientos
 
