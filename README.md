@@ -245,6 +245,10 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 - GitHub: [@DavidSP12](https://github.com/DavidSP12)
 - Email: dpineros05@gmail.com
 
+**Daniel Vidal**
+- GitHub: [@Dasdoria1O1](https://github.com/Dasdoria1O1)
+- Email: davdl0105@gmail.com
+
 ## 🙏 Agradecimientos
 
 - **Material Design** por las guías de diseño
