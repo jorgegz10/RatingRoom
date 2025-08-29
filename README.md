@@ -249,6 +249,11 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 - GitHub: [@Dasdoria1O1](https://github.com/Dasdoria1O1)
 - Email: davdl0105@gmail.com
 
+**Jorge Gomez**
+- GitHub: [@jorgegz10](https://github.com/jorgegz10)
+- Email: gzjorgeesteban@yahoo.com
+
+
 ## 🙏 Agradecimientos
 
 - **Material Design** por las guías de diseño
