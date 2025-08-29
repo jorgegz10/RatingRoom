@@ -7,19 +7,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun UserAvatar(
     name: String,
     isOnline: Boolean = false,
     size: Dp = 40.dp,
-    backgroundColor: Color = Color(0xFF2196F3),
-    textColor: Color = Color.White,
+    backgroundColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
+    textColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onPrimary,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -40,12 +39,12 @@ fun UserAvatar(
                 )
             }
         }
-        
+
         if (isOnline) {
             Box(
                 modifier = Modifier
                     .size(size * 0.25f)
-                    .background(Color.Green, CircleShape)
+                    .background(MaterialTheme.colorScheme.tertiary, CircleShape)
                     .align(Alignment.BottomEnd)
             )
         }

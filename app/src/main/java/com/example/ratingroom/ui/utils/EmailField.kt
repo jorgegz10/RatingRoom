@@ -4,9 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -21,13 +20,14 @@ fun EmailField(
     placeholder: String = "tu@correo.com",
     modifier: Modifier = Modifier
 ) {
+    val c = MaterialTheme.colorScheme
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
             text = label,
             fontSize = 14.sp,
-            color = colorResource(id = R.color.black),
+            color = c.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         OutlinedTextField(
@@ -36,7 +36,7 @@ fun EmailField(
             placeholder = {
                 Text(
                     text = placeholder,
-                    color = colorResource(id = R.color.medium_gray)
+                    color = c.onSurfaceVariant
                 )
             },
             modifier = Modifier.fillMaxWidth(),
@@ -44,10 +44,10 @@ fun EmailField(
                 keyboardType = KeyboardType.Email
             ),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(id = R.color.primary_blue),
-                unfocusedBorderColor = colorResource(id = R.color.light_gray),
-                focusedTextColor = colorResource(id = R.color.black),
-                unfocusedTextColor = colorResource(id = R.color.black)
+                focusedBorderColor = c.primary,
+                unfocusedBorderColor = c.outline,
+                focusedTextColor = c.onSurface,
+                unfocusedTextColor = c.onSurface
             ),
             shape = RoundedCornerShape(8.dp)
         )

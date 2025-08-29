@@ -7,7 +7,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -16,6 +15,7 @@ import androidx.compose.ui.unit.sp
 fun EmptyActivityState(
     modifier: Modifier = Modifier
 ) {
+    val c = MaterialTheme.colorScheme
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -25,20 +25,20 @@ fun EmptyActivityState(
             imageVector = Icons.Default.Timeline,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = Color.Gray
+            tint = c.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "No hay actividad reciente",
             fontSize = 18.sp,
-            color = Color.Gray,
+            color = c.onSurfaceVariant,
             fontWeight = FontWeight.Medium
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Las reseñas y actividades de tus amigos aparecerán aquí",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = c.onSurfaceVariant
         )
     }
 }
@@ -54,7 +54,8 @@ fun EmptyFriendsState(
         3 -> Pair("Descubre nuevos amigos", Icons.Default.Search)
         else -> Pair("No tienes amigos aún", Icons.Default.Group)
     }
-    
+
+    val c = MaterialTheme.colorScheme
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,20 +65,20 @@ fun EmptyFriendsState(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
-            tint = Color.Gray
+            tint = c.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = message,
             fontSize = 18.sp,
-            color = Color.Gray,
+            color = c.onSurfaceVariant,
             fontWeight = FontWeight.Medium
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "¡Agrega tu primer amigo!",
             fontSize = 14.sp,
-            color = Color.Gray
+            color = c.onSurfaceVariant
         )
     }
 }

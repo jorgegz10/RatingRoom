@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -21,10 +20,11 @@ fun FriendCard(
     onAction: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val c = MaterialTheme.colorScheme
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+        colors = CardDefaults.cardColors(containerColor = c.surface)
     ) {
         Row(
             modifier = Modifier
@@ -35,9 +35,7 @@ fun FriendCard(
             UserAvatar(
                 name = friend.name,
                 isOnline = friend.isOnline,
-                size = 50.dp,
-                backgroundColor = Color.LightGray,
-                textColor = Color.DarkGray
+                size = 50.dp
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -60,32 +58,33 @@ fun FriendInfo(
     friend: Friend,
     modifier: Modifier = Modifier
 ) {
+    val c = MaterialTheme.colorScheme
     Column(modifier = modifier) {
         Text(
             text = friend.name,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = c.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
         Text(
             text = friend.username,
             fontSize = 14.sp,
-            color = Color.Gray
+            color = c.onSurfaceVariant
         )
-        
+
         Text(
             text = if (friend.isOnline) "En línea" else "Visto por última vez ${friend.lastSeen}",
             fontSize = 12.sp,
-            color = if (friend.isOnline) Color.Green else Color.Gray
+            color = if (friend.isOnline) c.tertiary else c.onSurfaceVariant
         )
-        
+
         if (friend.mutualFriends > 0) {
             Text(
                 text = "${friend.mutualFriends} amigos en común",
                 fontSize = 12.sp,
-                color = Color.Gray
+                color = c.onSurfaceVariant
             )
         }
     }
@@ -96,20 +95,21 @@ fun FriendActions(
     onMessage: () -> Unit,
     onViewProfile: () -> Unit
 ) {
+    val c = MaterialTheme.colorScheme
     Column {
         IconButton(onClick = onMessage) {
             Icon(
                 Icons.Default.Message,
                 contentDescription = "Mensaje",
-                tint = Color.White
+                tint = c.primary
             )
         }
-        
+
         IconButton(onClick = onViewProfile) {
             Icon(
                 Icons.Default.Person,
                 contentDescription = "Ver perfil",
-                tint = Color.Gray
+                tint = c.onSurfaceVariant
             )
         }
     }

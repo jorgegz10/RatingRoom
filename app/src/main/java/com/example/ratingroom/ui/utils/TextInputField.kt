@@ -1,16 +1,17 @@
 package com.example.ratingroom.ui.utils
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.ratingroom.R
 
 @Composable
 fun TextInputField(
@@ -21,35 +22,43 @@ fun TextInputField(
     keyboardType: KeyboardType = KeyboardType.Text,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = colorResource(id = R.color.black),
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+    val c = MaterialTheme.colorScheme
+    Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            placeholder = {
-                Text(
-                    text = placeholder,
-                    color = colorResource(id = R.color.medium_gray)
-                )
-            },
+            label = { Text(label, color = c.onSurfaceVariant) },
+            placeholder = { Text(placeholder, color = c.onSurfaceVariant) },
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType
-            ),
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(id = R.color.primary_blue),
-                unfocusedBorderColor = colorResource(id = R.color.light_gray),
-                focusedTextColor = colorResource(id = R.color.black),
-                unfocusedTextColor = colorResource(id = R.color.black)
+                focusedBorderColor = c.primary,
+                unfocusedBorderColor = c.outline,
+                cursorColor = c.primary,
+                focusedContainerColor = c.surface,
+                unfocusedContainerColor = c.surface,
+                focusedTextColor = c.onSurface,
+                unfocusedTextColor = c.onSurface
             ),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            singleLine = true
         )
     }
+}
+
+@Composable
+fun TextInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    modifier: Modifier = Modifier
+) {
+    TextInputField(
+        value = value,
+        onValueChange = onValueChange,
+        label = "",
+        placeholder = "",
+        keyboardType = keyboardType,
+        modifier = modifier
+    )
 }

@@ -11,10 +11,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratingroom.R
 import java.util.*
 
 @Composable
@@ -26,7 +24,7 @@ fun DatePickerField(
 ) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
-    
+
     val datePicker = remember {
         DatePickerDialog(
             context,
@@ -38,14 +36,14 @@ fun DatePickerField(
             calendar.get(Calendar.DAY_OF_MONTH)
         )
     }
-    
+
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
             text = label,
             fontSize = 14.sp,
-            color = colorResource(id = R.color.black),
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         OutlinedTextField(
@@ -61,8 +59,8 @@ fun DatePickerField(
                 .clickable { datePicker.show() },
             readOnly = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(id = R.color.primary_blue),
-                unfocusedBorderColor = colorResource(id = R.color.light_gray)
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline
             ),
             shape = RoundedCornerShape(8.dp)
         )

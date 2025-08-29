@@ -3,233 +3,171 @@ package com.example.ratingroom.ui.screens.moviedetail
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.ratingroom.data.models.Movie
-import com.example.ratingroom.data.repository.MovieRepository
-import com.example.ratingroom.ui.theme.RatingRoomTheme
-import com.example.ratingroom.ui.utils.GradientBackground
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.foundation.clickable
-
+import com.example.ratingroom.data.models.Review
+import com.example.ratingroom.ui.utils.MoviePoster
 
 @Composable
-fun MovieDetailScreen(
+fun MovieDetailRoute(
     movieId: Int,
-    modifier: Modifier = Modifier,
-    onShowMore: () -> Unit,
+    onBack: () -> Unit,
     viewModel: MovieDetailViewModel = viewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    
-    LaunchedEffect(movieId) {
-        viewModel.loadMovieDetail(movieId)
-    }
-    
-    MovieDetailScreenContent(
+    LaunchedEffect(movieId) { viewModel.loadMovieDetail(movieId) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    MovieDetailScreen(
         uiState = uiState,
-        onShowMore = onShowMore,
-        modifier = modifier
+        onBack = onBack,
+        onClearError = { viewModel.clearError() }
     )
 }
 
 @Composable
-fun MovieDetailScreenContent(
+fun MovieDetailScreen(
     uiState: MovieDetailUIState,
-    onShowMore: () -> Unit,
-    modifier: Modifier = Modifier
+    onBack: () -> Unit = {},
+    onClearError: () -> Unit = {}
 ) {
-    val cs = MaterialTheme.colorScheme
+    val movie = uiState.movie
+    val snackbarHostState = SnackbarHostState()
 
-    GradientBackground {
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { snackbarHostState.showSnackbar(it) }
+    }
+
+    Scaffold(
+        topBar = {
+            // TopBar estable
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                shadowElevation = 4.dp
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Atrás"
+                        )
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = movie?.title ?: "Detalle",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    action = { TextButton(onClick = onClearError) { Text("OK") } }
+                ) { Text(data.visuals.message) }
+            }
+        }
+    ) { inner ->
         when {
             uiState.isLoading -> {
                 Box(
-                    modifier = modifier.fillMaxSize(),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(inner),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
                 }
             }
-            uiState.movie != null -> {
+
+            movie != null -> {
                 LazyColumn(
-                    modifier = modifier
+                    modifier = Modifier
+                        .padding(inner)
                         .fillMaxSize()
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    val movie = uiState.movie
-            // Imagen de la película (placeholder sobre surfaceVariant)
-            item {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = cs.surfaceVariant,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Imagen de ${movie.title}",
-                            color = cs.onSurfaceVariant
+                    item {
+                        // Poster 2:3
+                        MoviePoster(
+                            imageRes = movie.imageRes,
+                            movieTitle = movie.title,
+                            width = 260.dp,
+                            height = 390.dp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(2f / 3f)
                         )
+                        Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            text = "${movie.year} • ${movie.duration}",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            text = movie.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(Modifier.height(16.dp))
+
+                        Text(
+                            text = "Reseñas",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(Modifier.height(8.dp))
                     }
-                }
-            }
 
-            // Información básica
-            item {
-                Column {
-                    Text(
-                        text = movie.title,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = cs.onPrimary
-                    )
-                    Text(
-                        text = "${movie.year} • ${movie.duration} • ${movie.genre}",
-                        fontSize = 16.sp,
-                        color = cs.onPrimary.copy(alpha = 0.85f)
-                    )
-                    Text(
-                        text = "Dirigida por ${movie.director}",
-                        fontSize = 14.sp,
-                        color = cs.onPrimary.copy(alpha = 0.75f)
-                    )
-                }
-            }
-
-            // Rating
-            item {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Filled.Star,
-                        contentDescription = null,
-                        tint = cs.tertiary, // antes: #FFD700
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = movie.rating.toString(),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = cs.onPrimary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "(${movie.reviews} reseñas)",
-                        fontSize = 16.sp,
-                        color = cs.onPrimary.copy(alpha = 0.8f)
-                    )
-                }
-            }
-
-            // Descripción
-            item {
-                Column {
-                    Text(
-                        text = "Sinopsis",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = cs.onPrimary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = movie.description,
-                        fontSize = 14.sp,
-                        color = cs.onPrimary,
-                        lineHeight = 20.sp
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "Ver más",
-                        color = cs.onPrimary,
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.clickable { onShowMore() }
-                    )
-                }
-            }
-
-            // Reseñas (título)
-            item {
-                Text(
-                    text = "Reseñas (${uiState.reviews.size})",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = cs.onPrimary
-                )
-            }
-
-            // Cards de reseñas
-            items(uiState.reviews) { review ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = cs.surfaceVariant)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Usuario ${review.userId}",
-                                fontWeight = FontWeight.Bold,
-                                color = cs.onSurface
-                            )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Filled.Star,
-                                    contentDescription = null,
-                                    tint = cs.tertiary,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = review.rating.toString(),
-                                    color = cs.onSurface,
-                                    fontSize = 14.sp
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = review.comment,
-                            color = cs.onSurface,
-                            fontSize = 14.sp
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = review.date,
-                            color = cs.onSurfaceVariant,
-                            fontSize = 12.sp
-                        )
+                    items(uiState.reviews) { review ->
+                        ReviewItem(review = review)
+                        Spacer(Modifier.height(12.dp))
                     }
+
+                    item { Spacer(Modifier.height(24.dp)) }
                 }
             }
-                }
-            }
-            uiState.errorMessage != null -> {
+
+            else -> {
                 Box(
-                    modifier = modifier.fillMaxSize(),
+                    Modifier
+                        .fillMaxSize()
+                        .padding(inner),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Error: ${uiState.errorMessage}",
-                        color = cs.error
+                        text = "No se encontró la película",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -237,22 +175,27 @@ fun MovieDetailScreenContent(
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun PreviewMovieDetailScreen() {
-    RatingRoomTheme {
-        // Ejemplo simple de Movie para el preview
-        val sample = Movie(
-            id = 1,
-            title = "Interestelar",
-            year = "2014",
-            duration = "2h 49m",
-            genre = "Sci-Fi",
-            director = "Christopher Nolan",
-            rating = 4.7,
-            reviews = 1284,
-            description = "Un equipo de exploradores viaja a través de un agujero de gusano en el espacio para asegurar el futuro de la humanidad."
-        )
+private fun ReviewItem(review: Review) {
+    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(12.dp)) {
+            Text(
+                text = "⭐ ${review.rating}",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = review.comment,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = review.date,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
-

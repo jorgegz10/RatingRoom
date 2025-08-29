@@ -6,7 +6,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,11 +26,12 @@ import com.example.ratingroom.ui.utils.*
 @Composable
 fun EditProfileScreen(
     onSave: () -> Unit,
+    onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: EditProfileViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    
+
     EditProfileScreenContent(
         uiState = uiState,
         onDisplayNameChange = viewModel::onDisplayNameChange,
@@ -43,6 +45,7 @@ fun EditProfileScreen(
             viewModel.saveProfile()
             onSave()
         },
+        onBackClick = onBackClick,
         modifier = modifier
     )
 }
@@ -59,18 +62,35 @@ fun EditProfileScreenContent(
     onBirthdateChange: (String) -> Unit,
     onWebsiteChange: (String) -> Unit,
     onSave: () -> Unit,
+    onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val genres = listOf("Sci-Fi", "Acción", "Drama", "Comedia", "Terror", "Romance")
     val cs = MaterialTheme.colorScheme
 
-    GradientBackground {  // <— fondo azul degradado
+    GradientBackground {
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
+            // Header SOLO con flecha atrás (SIN LOGO)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(id = R.string.content_desc_back),
+                        tint = cs.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
             // FOTO DE PERFIL
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -82,40 +102,36 @@ fun EditProfileScreenContent(
                 ) {
                     Surface(
                         shape = CircleShape,
-                        color = cs.surfaceVariant,                    // antes: Color.LightGray
+                        color = cs.surfaceVariant,
                         modifier = Modifier.size(100.dp)
-                    ) {
-                        Box(Modifier.fillMaxSize())
-                    }
+                    ) { Box(Modifier.fillMaxSize()) }
                     IconButton(
                         onClick = {},
                         modifier = Modifier
                             .size(32.dp)
-                            .background(cs.primary, CircleShape)       // antes: Color.Black
+                            .background(cs.primary, CircleShape)
                     ) {
                         Icon(
-                            Icons.Default.CameraAlt,
+                            Icons.Filled.CameraAlt,
                             contentDescription = stringResource(id = R.string.change_photo),
-                            tint = cs.onPrimary                         // antes: Color.White
+                            tint = cs.onPrimary
                         )
                     }
                 }
                 Text(
                     stringResource(id = R.string.change_photo_hint),
                     fontSize = 12.sp,
-                    color = cs.onPrimary                               // antes: Color.White (mantiene look)
+                    color = cs.onPrimary
                 )
             }
 
             Spacer(Modifier.height(24.dp))
 
             // INFORMACIÓN PERSONAL
-            SectionCard(
-                title = stringResource(id = R.string.personal_info_title)
-            ) {
+            SectionCard(title = stringResource(id = R.string.personal_info_title)) {
                 TextInputField(
                     value = uiState.displayName,
-                onValueChange = onDisplayNameChange,
+                    onValueChange = onDisplayNameChange,
                     label = stringResource(id = R.string.display_name_label),
                     placeholder = stringResource(id = R.string.display_name_placeholder)
                 )
@@ -124,7 +140,7 @@ fun EditProfileScreenContent(
 
                 EmailField(
                     value = uiState.email,
-                onValueChange = onEmailChange,
+                    onValueChange = onEmailChange,
                     label = stringResource(id = R.string.email_label),
                     placeholder = stringResource(id = R.string.email_placeholder)
                 )
@@ -133,7 +149,7 @@ fun EditProfileScreenContent(
 
                 TextInputField(
                     value = uiState.biography,
-                onValueChange = onBiographyChange,
+                    onValueChange = onBiographyChange,
                     label = stringResource(id = R.string.biography_label),
                     placeholder = stringResource(id = R.string.biography_placeholder)
                 )
@@ -142,7 +158,7 @@ fun EditProfileScreenContent(
 
                 TextInputField(
                     value = uiState.location,
-                onValueChange = onLocationChange,
+                    onValueChange = onLocationChange,
                     label = stringResource(id = R.string.location_label),
                     placeholder = stringResource(id = R.string.location_placeholder)
                 )
@@ -151,12 +167,10 @@ fun EditProfileScreenContent(
             Spacer(Modifier.height(16.dp))
 
             // PREFERENCIAS
-            SectionCard(
-                title = stringResource(id = R.string.preferences_title)
-            ) {
+            SectionCard(title = stringResource(id = R.string.preferences_title)) {
                 DropdownField(
                     value = uiState.favoriteGenre,
-                onValueChange = onFavoriteGenreChange,
+                    onValueChange = onFavoriteGenreChange,
                     label = stringResource(id = R.string.favorite_genre_label),
                     options = genres
                 )
@@ -165,7 +179,7 @@ fun EditProfileScreenContent(
 
                 DatePickerField(
                     value = uiState.birthdate,
-                onValueChange = onBirthdateChange,
+                    onValueChange = onBirthdateChange,
                     label = stringResource(id = R.string.birthdate_label)
                 )
 
@@ -173,7 +187,7 @@ fun EditProfileScreenContent(
 
                 TextInputField(
                     value = uiState.website,
-                onValueChange = onWebsiteChange,
+                    onValueChange = onWebsiteChange,
                     label = stringResource(id = R.string.website_label),
                     placeholder = stringResource(id = R.string.website_placeholder),
                     keyboardType = KeyboardType.Uri
@@ -214,7 +228,8 @@ fun PreviewEditProfileScreen() {
             onFavoriteGenreChange = {},
             onBirthdateChange = {},
             onWebsiteChange = {},
-            onSave = {}
+            onSave = {},
+            onBackClick = {}
         )
     }
 }

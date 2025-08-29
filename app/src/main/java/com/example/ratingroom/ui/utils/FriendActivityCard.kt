@@ -6,7 +6,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -18,11 +17,13 @@ fun FriendActivityCard(
     activity: FriendActivity,
     onAction: (String) -> Unit,
     modifier: Modifier = Modifier
+
 ) {
+    val c = MaterialTheme.colorScheme
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = c.surface)
     ) {
         Column(
             modifier = Modifier
@@ -56,6 +57,7 @@ fun ActivityHeader(
     activity: FriendActivity,
     modifier: Modifier = Modifier
 ) {
+    val c = MaterialTheme.colorScheme
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
@@ -73,12 +75,12 @@ fun ActivityHeader(
                 text = activity.friend.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = c.onSurface
             )
             Text(
                 text = activity.action,
                 fontSize = 12.sp,
-                color = Color(0xFF2196F3),
+                color = c.primary,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -86,7 +88,7 @@ fun ActivityHeader(
         Text(
             text = activity.timestamp,
             fontSize = 12.sp,
-            color = Color.Gray
+            color = c.onSurfaceVariant
         )
     }
 }
@@ -96,11 +98,14 @@ fun ActivityMovieInfo(
     activity: FriendActivity,
     modifier: Modifier = Modifier
 ) {
+    val c = MaterialTheme.colorScheme
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.Top
     ) {
+
         MoviePoster(
+            imageRes = activity.posterRes,
             movieTitle = activity.movie,
             width = 60.dp,
             height = 80.dp
@@ -113,9 +118,9 @@ fun ActivityMovieInfo(
                 text = activity.movie,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = c.onSurface
             )
-            
+
             activity.rating?.let { rating ->
                 Spacer(modifier = Modifier.height(4.dp))
                 StarRating(
@@ -124,14 +129,14 @@ fun ActivityMovieInfo(
                     showText = true
                 )
             }
-            
+
             activity.comment?.let { comment ->
                 if (comment.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "\"$comment\"",
                         fontSize = 12.sp,
-                        color = Color.DarkGray,
+                        color = c.onSurfaceVariant,
                         lineHeight = 16.sp,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis

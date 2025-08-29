@@ -1,15 +1,17 @@
 package com.example.ratingroom.ui.utils
 
 import androidx.compose.animation.core.*
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,7 +19,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,18 +53,16 @@ fun ModernNavigationDrawer(
         label = "drawer_alpha"
     )
 
-    // Overlay de fondo
     if (isOpen) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
+                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.5f))
                 .clickable { onToggle() }
                 .zIndex(1f)
         )
     }
 
-    // Drawer principal con WindowInsets
     Box(
         modifier = modifier
             .width(animatedWidth)
@@ -87,7 +86,6 @@ fun ModernNavigationDrawer(
                         .fillMaxSize()
                         .padding(16.dp)
                 ) {
-                    // Header con logo y perfil
                     DrawerHeader(
                         alpha = animatedAlpha,
                         onClose = onToggle
@@ -95,7 +93,6 @@ fun ModernNavigationDrawer(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Items de navegación
                     NavigationItems(
                         currentScreen = currentScreen,
                         onNavigate = onNavigate,
@@ -104,7 +101,6 @@ fun ModernNavigationDrawer(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    // Botón de logout
                     LogoutSection(
                         onLogout = onLogout,
                         alpha = animatedAlpha
@@ -126,7 +122,6 @@ private fun DrawerHeader(
             .graphicsLayer { this.alpha = alpha },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Logo y título
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -149,7 +144,7 @@ private fun DrawerHeader(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            
+
             IconButton(
                 onClick = onClose,
                 modifier = Modifier.size(32.dp)
@@ -164,7 +159,6 @@ private fun DrawerHeader(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Avatar y info del usuario
         Box(
             modifier = Modifier
                 .size(64.dp)
@@ -178,7 +172,7 @@ private fun DrawerHeader(
                 text = "U",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
 
@@ -190,7 +184,7 @@ private fun DrawerHeader(
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface
         )
-        
+
         Text(
             text = "usuario@email.com",
             fontSize = 12.sp,
@@ -230,7 +224,7 @@ private fun NavigationDrawerItem(
     } else {
         Color.Transparent
     }
-    
+
     val contentColor = if (isSelected) {
         MaterialTheme.colorScheme.onPrimaryContainer
     } else {
@@ -282,7 +276,7 @@ private fun LogoutSection(
             color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
             modifier = Modifier.padding(vertical = 16.dp)
         )
-        
+
         Surface(
             modifier = Modifier
                 .fillMaxWidth()

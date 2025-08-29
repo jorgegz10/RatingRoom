@@ -6,19 +6,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ratingroom.R
 
 @Composable
 fun CustomButton(
     text: String,
     onClick: () -> Unit,
-    backgroundColor: Color = colorResource(id = R.color.medium_gray),
-    textColor: Color = colorResource(id = R.color.white),
+    backgroundColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
+    textColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onPrimary,
     modifier: Modifier = Modifier
 ) {
     Button(
