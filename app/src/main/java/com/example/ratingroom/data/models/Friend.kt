@@ -7,11 +7,14 @@ data class Friend(
     val profileImageUrl: String? = null,
     val isOnline: Boolean = false,
     val lastSeen: String = "",
+    val isFriend: Boolean = false,
     val mutualFriends: Int = 0,
+    val isFollowing: Boolean = false,
     val relationshipType: FriendshipType = FriendshipType.NONE,
     val favoriteGenres: List<String> = emptyList(),
     val totalReviews: Int = 0,
     val averageRating: Double = 0.0
+    
 )
 
 enum class FriendshipType {
@@ -35,12 +38,3 @@ enum class RequestStatus {
     ACCEPTED,
     REJECTED
 }
-
-data class FriendActivity(
-    val friend: Friend,
-    val action: String,
-    val movie: String,
-    val rating: Double,
-    val comment: String,
-    val timeAgo: String
-)

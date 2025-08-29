@@ -148,4 +148,19 @@ object MovieRepository {
     fun getUserById(id: Int): User? = users.find { it.id == id }
     
     fun getReviewsForMovie(movieId: Int): List<Review> = reviews.filter { it.movieId == movieId }
+    
+    fun getWatchLaterMovies(): List<Movie> {
+        // Simulamos películas en "Ver más tarde"
+        return movies.take(2)
+    }
+    
+    fun getFavoriteMovies(): List<Movie> {
+        // Simulamos películas favoritas
+        return movies.filter { it.rating >= 4.7 }
+    }
+    
+    fun getWatchedMovies(): List<Movie> {
+        // Simulamos películas vistas
+        return movies.takeLast(3)
+    }
 }

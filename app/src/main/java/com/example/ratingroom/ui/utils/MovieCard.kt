@@ -21,6 +21,8 @@ import com.example.ratingroom.data.models.Movie
 fun MovieCard(
     movie: Movie,
     onClick: () -> Unit = {},
+    onFavoriteClick: (() -> Unit)? = null,
+    isFavorite: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Card(

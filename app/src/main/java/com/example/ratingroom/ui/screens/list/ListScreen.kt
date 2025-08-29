@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.data.models.Movie
 import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.ui.theme.RatingRoomTheme
@@ -28,9 +29,27 @@ import com.example.ratingroom.ui.utils.MovieCard
 @Composable
 fun ListScreen(
     onMovieClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ListViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    ListScreenContent(
+        uiState = uiState,
+        onTabSelected = viewModel::onTabSelected,
+        onMovieClick = onMovieClick,
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ListScreenContent(
+    uiState: ListUIState,
+    onTabSelected: (Int) -> Unit,
+    onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selectedTab by remember { mutableStateOf(0) }
     
     Column(
         modifier = modifier
@@ -72,48 +91,41 @@ fun ListScreen(
             Column {
                 // Tab Row
                 ListTabRow(
-                    selectedTab = selectedTab,
-                    onTabSelected = { selectedTab = it }
+                    selectedTab = uiState.selectedTab,
+                    onTabSelected = onTabSelected
                 )
 
                 // Contenido de cada tab
-                when (selectedTab) {
+                when (uiState.selectedTab) {
                     0 -> {
-                        // Por ver: mostrar una película (ejemplo id=1)
-                        val movie = remember { MovieRepository.getMovieById(1) }
-                        movie?.let {
+                        if (uiState.watchLaterMovies.isNotEmpty()) {
                             MovieList(
-                                items = listOf(it),
+                                items = uiState.watchLaterMovies,
                                 onMovieClick = onMovieClick
                             )
-                        } ?: EmptyTabContent(tabIndex = 0, modifier = Modifier.fillMaxSize())
+                        } else {
+                            EmptyTabContent(tabIndex = 0, modifier = Modifier.fillMaxSize())
+                        }
                     }
                     1 -> {
-                        // Favoritos: mostrar dos películas distintas (ejemplo id=2 y id=3)
-                        val favorites = remember { 
-                            listOfNotNull(
-                                MovieRepository.getMovieById(2), 
-                                MovieRepository.getMovieById(3)
-                            ) 
-                        }
-                        if (favorites.isEmpty()) {
-                            EmptyTabContent(tabIndex = 1, modifier = Modifier.fillMaxSize())
-                        } else {
+                        if (uiState.favoriteMovies.isNotEmpty()) {
                             MovieList(
-                                items = favorites,
+                                items = uiState.favoriteMovies,
                                 onMovieClick = onMovieClick
                             )
+                        } else {
+                            EmptyTabContent(tabIndex = 1, modifier = Modifier.fillMaxSize())
                         }
                     }
                     2 -> {
-                        // Vistos: mostrar una película diferente (ejemplo id=4)
-                        val seen = remember { MovieRepository.getMovieById(4) }
-                        seen?.let { 
+                        if (uiState.watchedMovies.isNotEmpty()) {
                             MovieList(
-                                items = listOf(it),
+                                items = uiState.watchedMovies,
                                 onMovieClick = onMovieClick
                             )
-                        } ?: EmptyTabContent(tabIndex = 2, modifier = Modifier.fillMaxSize())
+                        } else {
+                            EmptyTabContent(tabIndex = 2, modifier = Modifier.fillMaxSize())
+                        }
                     }
                     else -> EmptyTabContent(tabIndex = 0, modifier = Modifier.fillMaxSize())
                 }
@@ -234,8 +246,15 @@ fun EmptyTabContent(tabIndex: Int, modifier: Modifier = Modifier) {
 @Composable
 fun PreviewListScreen() {
     RatingRoomTheme {
-        ListScreen(
-            onMovieClick = { /* Preview */ }
+        ListScreenContent(
+            uiState = ListUIState(
+                selectedTab = 0,
+                watchLaterMovies = emptyList(),
+                favoriteMovies = emptyList(),
+                watchedMovies = emptyList()
+            ),
+            onTabSelected = {},
+            onMovieClick = {}
         )
     }
 }

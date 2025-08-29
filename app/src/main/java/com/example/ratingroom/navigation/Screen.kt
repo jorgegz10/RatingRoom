@@ -12,24 +12,22 @@ public sealed class Screen(val route: String, val title: String, val icon: Image
     
     // Pantallas principales
     object MainMenu : Screen("main_menu", "Inicio", Icons.Default.Home)
-    object EditProfile : Screen("edit_profile", "Mi Perfil", Icons.Default.Person)
+    object Profile : Screen("profile", "Mi Perfil", Icons.Default.Person)
+    object EditProfile : Screen("edit_profile", "Editar Perfil")
     object Friends : Screen("friends", "Amigos", Icons.Default.People)
     object Favorites : Screen("favorites", "Favoritos", Icons.Default.Favorite)
     object Settings : Screen("settings", "Configuración", Icons.Default.Settings)
+    object List : Screen("list", "Lista de Películas", Icons.Default.List)
+    object Reviews : Screen("reviews", "Mis Reseñas", Icons.Default.RateReview)
     
     // Pantallas de detalle con argumentos
     object MovieDetail : Screen("movie_detail/{movieId}", "Detalle de Película") {
         fun createRoute(movieId: Int) = "movie_detail/$movieId"
     }
     
-    // Nuevas pantallas
     object Synopsis : Screen("synopsis/{movieId}", "Sinopsis") {
         fun createRoute(movieId: Int) = "synopsis/$movieId"
     }
-    
-    object Reviews : Screen("reviews", "Mis Reseñas", Icons.Default.RateReview)
-    
-    object List : Screen("list", "Lista de Películas", Icons.Default.List)
     
     companion object {
         // Lista de pantallas principales para el drawer
@@ -37,7 +35,7 @@ public sealed class Screen(val route: String, val title: String, val icon: Image
             MainMenu,
             List,
             Reviews,
-            EditProfile,
+            Profile,  // Cambiado de EditProfile a Profile
             Friends,
             Favorites,
             Settings

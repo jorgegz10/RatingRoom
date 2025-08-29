@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.moviedetail
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.data.models.Movie
 import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.ui.theme.RatingRoomTheme
@@ -24,20 +25,50 @@ import androidx.compose.foundation.clickable
 
 @Composable
 fun MovieDetailScreen(
-    movie: Movie,
+    movieId: Int,
     modifier: Modifier = Modifier,
-    onShowMore: () -> Unit
+    onShowMore: () -> Unit,
+    viewModel: MovieDetailViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    LaunchedEffect(movieId) {
+        viewModel.loadMovieDetail(movieId)
+    }
+    
+    MovieDetailScreenContent(
+        uiState = uiState,
+        onShowMore = onShowMore,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun MovieDetailScreenContent(
+    uiState: MovieDetailUIState,
+    onShowMore: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val cs = MaterialTheme.colorScheme
-    val reviews = remember { MovieRepository.getReviewsForMovie(movie.id) }
 
     GradientBackground {
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            uiState.movie != null -> {
+                LazyColumn(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    val movie = uiState.movie
             // Imagen de la película (placeholder sobre surfaceVariant)
             item {
                 Surface(
@@ -135,7 +166,7 @@ fun MovieDetailScreen(
             // Reseñas (título)
             item {
                 Text(
-                    text = "Reseñas",
+                    text = "Reseñas (${uiState.reviews.size})",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = cs.onPrimary
@@ -143,7 +174,7 @@ fun MovieDetailScreen(
             }
 
             // Cards de reseñas
-            items(reviews) { review ->
+            items(uiState.reviews) { review ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = cs.surfaceVariant)
@@ -187,6 +218,19 @@ fun MovieDetailScreen(
                             fontSize = 12.sp
                         )
                     }
+                }
+            }
+                }
+            }
+            uiState.errorMessage != null -> {
+                Box(
+                    modifier = modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Error: ${uiState.errorMessage}",
+                        color = cs.error
+                    )
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.reviews
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,24 +8,40 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.ui.utils.AppTopBar
 import com.example.ratingroom.ui.utils.TopBarConfig
 import com.example.ratingroom.ui.utils.EmptyActivityState
 import com.example.ratingroom.ui.utils.ReviewCard
+import com.example.ratingroom.ui.theme.RatingRoomTheme
 
 @Composable
 fun ReviewsScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: ReviewsViewModel = viewModel()
 ) {
-    var loading by remember { mutableStateOf(false) }   // cámbialo cuando conectes repo
-    val reviews = remember {
-        mutableStateListOf(
-            // demo - reemplaza con tu repositorio real
-            Triple("Inception", 5, "Una película increíble que te hace pensar. Los efectos visuales son espectaculares y la historia es muy original." ),
-            Triple("The Matrix", 4, "Un clásico del cine de ciencia ficción. Revolucionó el género y sigue siendo relevante hoy en día."),
-            Triple("Interstellar", 5, "Obra maestra: ciencia, emoción e imágenes se combinan perfectamente.")
-        )
-    }
+    val uiState by viewModel.uiState.collectAsState()
+    
+    ReviewsScreenContent(
+        uiState = uiState,
+        onBack = onBack,
+        onEditReview = viewModel::editReview,
+        onDeleteReview = viewModel::deleteReview,
+        onClearError = viewModel::clearError,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ReviewsScreenContent(
+    uiState: ReviewsUIState,
+    onBack: () -> Unit,
+    onEditReview: (ReviewItem) -> Unit,
+    onDeleteReview: (ReviewItem) -> Unit,
+    onClearError: () -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     Scaffold(
         topBar = {
@@ -39,7 +55,7 @@ fun ReviewsScreen(
         }
     ) { padding ->
         when {
-            loading -> {
+            uiState.isLoading -> {
                 Column(Modifier.padding(padding).padding(16.dp)) {
                     repeat(3) {
                         Surface(
@@ -52,7 +68,7 @@ fun ReviewsScreen(
                     }
                 }
             }
-            reviews.isEmpty() -> {
+            uiState.reviews.isEmpty() && !uiState.isLoading -> {
                 EmptyActivityState(
                     modifier = Modifier
                         .padding(padding)
@@ -67,11 +83,11 @@ fun ReviewsScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(reviews) { (title, rating, text) ->
+                    items(uiState.reviews) { review ->
                         ReviewCard(
-                            title = title,
-                            rating = rating,
-                            excerpt = text,
+                            title = review.movieTitle,
+                            rating = review.rating,
+                            excerpt = review.comment,
                             timeAgo = "Hace 3 días"
                         )
                     }
@@ -83,9 +99,28 @@ fun ReviewsScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ReviewsScreenPreview() {
-    // Envuelve siempre en tu theme
-    com.example.ratingroom.ui.theme.RatingRoomTheme {
-        ReviewsScreen(onBack = {})
+    RatingRoomTheme {
+        ReviewsScreenContent(
+            uiState = ReviewsUIState(
+                reviews = listOf(
+                    ReviewItem(
+                        movieTitle = "Inception",
+                        rating = 5,
+                        comment = "Una película increíble que te hace pensar."
+                    ),
+                    ReviewItem(
+                        movieTitle = "The Matrix",
+                        rating = 4,
+                        comment = "Un clásico del cine de ciencia ficción."
+                    )
+                ),
+                isLoading = false
+            ),
+            onBack = {},
+            onEditReview = {},
+            onDeleteReview = {},
+            onClearError = {}
+        )
     }
 }
 

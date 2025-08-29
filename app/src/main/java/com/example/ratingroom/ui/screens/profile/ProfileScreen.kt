@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.profile
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -13,41 +13,39 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.*
-
-// Modelo de datos para el perfil
-data class ProfileData(
-    val name: String,
-    val email: String,
-    val memberSince: String,
-    val favoriteGenre: String,
-    val reviewsCount: Int,
-    val averageRating: Double
-)
 
 @Composable
 fun ProfileScreen(
     onBackClick: () -> Unit = {},
     onEditClick: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: ProfileViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val isDarkMode = uiState.isDarkMode.takeIf { uiState.profileData != null } ?: isSystemInDarkTheme()
+    
+    ProfileScreenContent(
+        uiState = uiState,
+        isDarkMode = isDarkMode,
+        onBackClick = onBackClick,
+        onEditClick = onEditClick,
+        onDarkModeChange = viewModel::onDarkModeChange,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ProfileScreenContent(
+    uiState: ProfileUIState,
+    isDarkMode: Boolean,
+    onBackClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDarkModeChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // ESTADO CENTRALIZADO - Solo aquí hay remember
-    val profileData by remember {
-        mutableStateOf(
-            ProfileData(
-                name = "Pedro",
-                email = "pedro@correo.com",
-                memberSince = "Enero 2024",
-                favoriteGenre = "Sci-Fi",
-                reviewsCount = 3,
-                averageRating = 4.7
-            )
-        )
-    }
-
-    var isDarkMode by remember { mutableStateOf(false) } // Placeholder, actual value determined below
-    
     val cs = MaterialTheme.colorScheme
 
     GradientBackground {
@@ -56,8 +54,6 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(12.dp)
         ) {
-            // Correctly access isSystemInDarkTheme() within a Composable context
-            isDarkMode = isSystemInDarkTheme()
 
             AppTopBar(
                 config = TopBarConfig(
@@ -77,27 +73,38 @@ fun ProfileScreen(
             ) {
                 Column(Modifier.fillMaxSize().padding(12.dp)) {
 
-                    // Componente sin remember - recibe datos
-                    ProfileHeader(
-                        profileData = profileData,
-                        colorScheme = cs
-                    )
+                    if (uiState.isLoading) {
+                        // Loading state
+                        Box(
+                            modifier = Modifier.fillMaxWidth().height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else {
+                        uiState.profileData?.let { profileData ->
+                            ProfileHeader(
+                                profileData = profileData,
+                                colorScheme = cs
+                            )
+                        }
+                    }
 
                     Spacer(Modifier.height(12.dp))
 
-                    // Componente sin remember - recibe datos
-                    ProfileMetrics(
-                        reviewsCount = profileData.reviewsCount,
-                        averageRating = profileData.averageRating,
-                        colorScheme = cs
-                    )
+                    uiState.profileData?.let { profileData ->
+                        ProfileMetrics(
+                            reviewsCount = profileData.reviewsCount,
+                            averageRating = profileData.averageRating,
+                            colorScheme = cs
+                        )
+                    }
 
                     Spacer(Modifier.height(12.dp))
 
-                    // Componente sin remember - recibe estado y callback
                     ProfileSettings(
                         isDarkMode = isDarkMode,
-                        onDarkModeChange = { isDarkMode = it },
+                        onDarkModeChange = onDarkModeChange,
                         colorScheme = cs
                     )
 
@@ -264,6 +271,23 @@ fun RecentReviews(
 @Composable
 fun ProfileScreenPreview() {
     RatingRoomTheme {
-        ProfileScreen()
+        ProfileScreenContent(
+            uiState = ProfileUIState(
+                profileData = ProfileData(
+                    name = "Pedro",
+                    email = "pedro@correo.com",
+                    memberSince = "Enero 2024",
+                    favoriteGenre = "Sci-Fi",
+                    reviewsCount = 3,
+                    averageRating = 4.7
+                ),
+                isDarkMode = false,
+                isLoading = false
+            ),
+            isDarkMode = false,
+            onBackClick = {},
+            onEditClick = {},
+            onDarkModeChange = {}
+        )
     }
 }

@@ -11,20 +11,31 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.ratingroom.ui.screens.*
+import com.example.ratingroom.ui.screens.login.LoginScreen
+import com.example.ratingroom.ui.screens.register.RegisterScreen
+import com.example.ratingroom.ui.screens.forgotpassword.ForgotPasswordScreen
+import com.example.ratingroom.ui.screens.main.MainMenuScreen
+import com.example.ratingroom.ui.screens.profile.EditProfileScreen
+import com.example.ratingroom.ui.screens.friends.FriendsScreen
+import com.example.ratingroom.ui.screens.list.ListScreen
+import com.example.ratingroom.ui.screens.reviews.ReviewsScreen
+import com.example.ratingroom.ui.screens.moviedetail.MovieDetailScreen
+import com.example.ratingroom.ui.screens.synopsis.SynopsisScreen
+import com.example.ratingroom.ui.screens.settings.SettingsScreen
+import com.example.ratingroom.ui.screens.favorites.FavoritesScreen
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.*
 import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.data.models.Movie
 import com.example.ratingroom.data.repository.FriendsRepository
 import com.example.ratingroom.navigation.Screen
+import com.example.ratingroom.ui.screens.profile.ProfileScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,30 +56,8 @@ fun RatingRoomApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     
-    // Estados globales
+    // Estados globales mínimos necesarios para navegación
     var isDrawerOpen by remember { mutableStateOf(false) }
-    var selectedMovie by remember { mutableStateOf<Movie?>(null) }
-    
-    // Estados para MainMenu
-    var searchQuery by remember { mutableStateOf("") }
-    var selectedGenre by remember { mutableStateOf("Todos") }
-    var filterExpanded by remember { mutableStateOf(false) }
-    
-    // Estados para EditProfile
-    var displayName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var biography by remember { mutableStateOf("") }
-    var location by remember { mutableStateOf("") }
-    var favoriteGenre by remember { mutableStateOf("Género Favorito") }
-    var birthdate by remember { mutableStateOf("mm / dd / yyyy") }
-    var website by remember { mutableStateOf("") }
-    
-    // Estados para ForgotPassword
-    var forgotPasswordEmail by remember { mutableStateOf("") }
-    
-    // Estados para Friends
-    var friendsSearchQuery by remember { mutableStateOf("") }
-    var selectedFriendsTab by remember { mutableStateOf(0) }
 
     // Función de navegación
     val navigateToScreen: (String) -> Unit = { route ->
@@ -117,7 +106,7 @@ fun RatingRoomApp() {
             onSaveClick = navigateBack
         )
         Screen.MovieDetail -> TopBarConfig(
-            title = selectedMovie?.title ?: "",
+            title = "Detalle de Película",
             showBackButton = true,
             onBackClick = navigateBack
         )
@@ -149,7 +138,7 @@ fun RatingRoomApp() {
                 contentWindowInsets = WindowInsets(0, 0, 0, 0)
             ) { innerPadding ->
                 
-                // NavHost - El corazón de la navegación
+                // NavHost - MANTENIDO COMO SOLICITASTE
                 NavHost(
                     navController = navController,
                     startDestination = Screen.Login.route,
@@ -158,7 +147,7 @@ fun RatingRoomApp() {
                     // Pantallas de autenticación
                     composable(Screen.Login.route) {
                         LoginScreen(
-                            onLoginClick = { _, _ -> 
+                            onLoginClick = { _, _ ->
                                 navController.navigate(Screen.MainMenu.route) {
                                     popUpTo(Screen.Login.route) { inclusive = true }
                                 }
@@ -171,103 +160,45 @@ fun RatingRoomApp() {
                     composable(Screen.Register.route) {
                         RegisterScreen(
                             onRegisterClick = { _, _, _, _, _, _ -> navigateBack() },
-                            onLoginClick = { navigateBack() }
+                            onLoginClick = navigateBack
                         )
                     }
                     
                     composable(Screen.ForgotPassword.route) {
                         ForgotPasswordScreen(
-                            email = forgotPasswordEmail,
-                            onEmailChange = { forgotPasswordEmail = it },
-                            onSendRecoveryClick = { navigateBack() },
-                            onBackToLoginClick = { navigateBack() }
+                            onSendRecoveryClick = { _ -> navigateBack() },
+                            onBackToLoginClick = navigateBack
                         )
                     }
                     
                     // Pantallas principales
                     composable(Screen.MainMenu.route) {
                         MainMenuScreen(
-                            searchQuery = searchQuery,
-                            onSearchQueryChange = { searchQuery = it },
-                            selectedGenre = selectedGenre,
-                            onGenreSelected = { selectedGenre = it },
-                            filterExpanded = filterExpanded,
-                            onFilterExpandedChange = { filterExpanded = it },
                             onMovieClick = { id ->
-                                Log.d("Ayuda", "$id")
                                 navigateToScreen(Screen.MovieDetail.createRoute(id))
                             }
                         )
                     }
                     
+                    // En el NavHost, agregar:
+                    composable(Screen.Profile.route) {
+                        ProfileScreen(
+                            onEditClick = { navigateToScreen(Screen.EditProfile.route) }
+                        )
+                    }
+                    
                     composable(Screen.EditProfile.route) {
                         EditProfileScreen(
-                            displayName = displayName,
-                            onDisplayNameChange = { displayName = it },
-                            email = email,
-                            onEmailChange = { email = it },
-                            biography = biography,
-                            onBiographyChange = { biography = it },
-                            location = location,
-                            onLocationChange = { location = it },
-                            favoriteGenre = favoriteGenre,
-                            onFavoriteGenreChange = { favoriteGenre = it },
-                            birthdate = birthdate,
-                            onBirthdateChange = { birthdate = it },
-                            website = website,
-                            onWebsiteChange = { website = it }
+                            onSave = navigateBack
                         )
                     }
                     
                     composable(Screen.Friends.route) {
                         FriendsScreen(
-                            searchQuery = friendsSearchQuery,
-                            onSearchQueryChange = { friendsSearchQuery = it },
-                            selectedTab = selectedFriendsTab,
-                            onTabSelected = { selectedFriendsTab = it },
-                            onFriendAction = { friend, action ->
-                                when (action) {
-                                    "message" -> println("Enviar mensaje a ${friend.name}")
-                                    "add_friend" -> {
-                                        FriendsRepository.addFriend(friend.id)
-                                        println("Amigo agregado: ${friend.name}")
-                                    }
-                                    "remove_friend" -> {
-                                        FriendsRepository.removeFriend(friend.id)
-                                        println("Amigo eliminado: ${friend.name}")
-                                    }
-                                    "follow" -> {
-                                        FriendsRepository.followUser(friend.id)
-                                        println("Siguiendo a ${friend.name}")
-                                    }
-                                    "unfollow" -> {
-                                        FriendsRepository.unfollowUser(friend.id)
-                                        println("Dejando de seguir a ${friend.name}")
-                                    }
-                                }
-                            }
+                            onBack = navigateBack
                         )
                     }
                     
-                    composable(Screen.Favorites.route) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = androidx.compose.ui.Alignment.Center
-                        ) {
-                            Text("Pantalla de Favoritos - En desarrollo")
-                        }
-                    }
-                    
-                    composable(Screen.Settings.route) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = androidx.compose.ui.Alignment.Center
-                        ) {
-                            Text("Pantalla de Configuración - En desarrollo")
-                        }
-                    }
-                    
-                    // Nueva pantalla de Lista
                     composable(Screen.List.route) {
                         ListScreen(
                             onMovieClick = { movieId ->
@@ -276,9 +207,23 @@ fun RatingRoomApp() {
                         )
                     }
                     
-                    // Nueva pantalla de Reviews
                     composable(Screen.Reviews.route) {
                         ReviewsScreen(
+                            onBack = navigateBack
+                        )
+                    }
+                    
+                    composable(Screen.Favorites.route) {
+                        FavoritesScreen(
+                            onBack = navigateBack,
+                            onMovieClick = { movieId ->
+                                navigateToScreen(Screen.MovieDetail.createRoute(movieId))
+                            }
+                        )
+                    }
+                    
+                    composable(Screen.Settings.route) {
+                        SettingsScreen(
                             onBack = navigateBack
                         )
                     }
@@ -292,20 +237,17 @@ fun RatingRoomApp() {
                             }
                         )
                     ) { backStackEntry ->
-                        val movieId = backStackEntry.arguments?.getInt("movieId")
-                        val movie = MovieRepository.getMovieById(movieId!!)
-
+                        val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
+                        
                         MovieDetailScreen(
-                            movie = movie!!,
+                            movieId = movieId,
                             onShowMore = { 
-                                // Navegar a Synopsis con el ID de la película
                                 navigateToScreen(Screen.Synopsis.createRoute(movieId))
-                            },
-                            modifier = Modifier.fillMaxSize()
+                            }
                         )
                     }
                     
-                    // Nueva pantalla de Synopsis
+                    // Pantalla de Synopsis
                     composable(
                         route = Screen.Synopsis.route,
                         arguments = listOf(
@@ -314,11 +256,10 @@ fun RatingRoomApp() {
                             }
                         )
                     ) { backStackEntry ->
-                        val movieId = backStackEntry.arguments?.getInt("movieId")
-                        val movie = MovieRepository.getMovieById(movieId!!)
-
+                        val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
+                        
                         SynopsisScreen(
-                            movie = movie!!,
+                            movieId = movieId,
                             onBackClick = navigateBack
                         )
                     }

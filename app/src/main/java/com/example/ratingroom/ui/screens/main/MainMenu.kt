@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.main
 
 import com.example.ratingroom.R
 import androidx.compose.foundation.layout.*
@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.ui.utils.*
 import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.data.models.Movie
@@ -20,11 +21,27 @@ import com.example.ratingroom.ui.theme.RatingRoomTheme
 
 @Composable
 fun MainMenuScreen(
-    searchQuery: String,
+    onMovieClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: MainMenuViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    MainMenuScreenContent(
+        uiState = uiState,
+        onSearchQueryChange = viewModel::onSearchQueryChange,
+        onGenreSelected = viewModel::onGenreSelected,
+        onFilterExpandedChange = viewModel::onFilterExpandedChange,
+        onMovieClick = onMovieClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun MainMenuScreenContent(
+    uiState: MainMenuUIState,
     onSearchQueryChange: (String) -> Unit,
-    selectedGenre: String,
     onGenreSelected: (String) -> Unit,
-    filterExpanded: Boolean,
     onFilterExpandedChange: (Boolean) -> Unit,
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -33,13 +50,13 @@ fun MainMenuScreen(
     val genres = MovieRepository.getGenres()
 
     // Filtrar películas basado en género y búsqueda
-    val filteredMovies = remember(selectedGenre, searchQuery) {
-        val moviesByGenre = MovieRepository.getMoviesByGenre(selectedGenre)
-        if (searchQuery.isBlank()) {
+    val filteredMovies = remember(uiState.selectedGenre, uiState.searchQuery) {
+        val moviesByGenre = MovieRepository.getMoviesByGenre(uiState.selectedGenre)
+        if (uiState.searchQuery.isBlank()) {
             moviesByGenre
         } else {
-            MovieRepository.searchMovies(searchQuery).filter { movie ->
-                selectedGenre == "Todos" || movie.genre == selectedGenre
+            MovieRepository.searchMovies(uiState.searchQuery).filter { movie ->
+                uiState.selectedGenre == "Todos" || movie.genre == uiState.selectedGenre
             }
         }
     }
@@ -54,7 +71,7 @@ fun MainMenuScreen(
         ) {
             // Barra de búsqueda
             SearchBar(
-                query = searchQuery,
+                query = uiState.searchQuery,
                 onQueryChange = onSearchQueryChange,
                 placeholder = stringResource(id = R.string.main_menu_search_placeholder)
             )
@@ -63,9 +80,9 @@ fun MainMenuScreen(
 
             // Filtros
             FilterDropdown(
-                expanded = filterExpanded,
+                expanded = uiState.filterExpanded,
                 onExpandedChange = onFilterExpandedChange,
-                selectedGenre = selectedGenre,
+                selectedGenre = uiState.selectedGenre,
                 genres = genres,
                 onGenreSelected = onGenreSelected
             )
@@ -103,12 +120,14 @@ fun MainMenuScreen(
 @Composable
 fun PreviewMainMenuScreen() {
     RatingRoomTheme {
-        MainMenuScreen(
-            searchQuery = "",
+        MainMenuScreenContent(
+            uiState = MainMenuUIState(
+                searchQuery = "",
+                selectedGenre = "Todos",
+                filterExpanded = false
+            ),
             onSearchQueryChange = {},
-            selectedGenre = "Todos",
             onGenreSelected = {},
-            filterExpanded = false,
             onFilterExpandedChange = {},
             onMovieClick = {}
         )

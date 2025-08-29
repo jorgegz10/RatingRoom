@@ -1,11 +1,11 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.synopsis
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -14,48 +14,72 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.data.models.Movie
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.AppTopBar
 import com.example.ratingroom.ui.utils.TopBarConfig
 import com.example.ratingroom.ui.utils.SectionCard
 
-data class CastMember(val name: String, val character: String, val isMain: Boolean = false)
-
 @Composable
 fun SynopsisScreen(
-    movie: Movie,
+    movieId: Int,
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: SynopsisViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    LaunchedEffect(movieId) {
+        viewModel.loadMovieSynopsis(movieId)
+    }
+    
+    SynopsisScreenContent(
+        uiState = uiState,
+        onBackClick = onBackClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun SynopsisScreenContent(
+    uiState: SynopsisUIState,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val cs = MaterialTheme.colorScheme
 
-    // Demo de reparto (luego lo conectas a tu repo)
-    val cast = listOf(
-        CastMember("Actor Principal", "Protagonista", true),
-        CastMember("Actriz Principal", "Protagonista", true),
-        CastMember("Actor Secundario 1", "Secundario"),
-        CastMember("Actriz Secundaria 2", "Secundaria")
-    )
-
     Scaffold(
         topBar = {
             AppTopBar(
                 TopBarConfig(
-                    title = "Sinopsis - ${movie.title}",
+                    title = "Sinopsis - ${uiState.movie?.title ?: "Cargando..."}",
                     showBackButton = true,
                     onBackClick = onBackClick
                 )
             )
         }
     ) { padding ->
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            uiState.movie != null -> {
+                Column(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    val movie = uiState.movie
             // Cabecera con info básica y poster gris (placeholder)
             Surface(
                 color = cs.surface,
@@ -98,14 +122,29 @@ fun SynopsisScreen(
             // Reparto principal
             SectionCard(title = "Reparto Principal") {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    cast.filter { it.isMain }.forEach { CastRow(it) }
+                    uiState.cast.filter { it.isMain }.forEach { CastRow(it) }
                 }
             }
 
             // Reparto adicional
             SectionCard(title = "Reparto") {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    cast.filter { !it.isMain }.forEach { CastRow(it) }
+                    uiState.cast.filter { !it.isMain }.forEach { CastRow(it) }
+                }
+            }
+                }
+            }
+            uiState.errorMessage != null -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Error: ${uiState.errorMessage}",
+                        color = cs.error
+                    )
                 }
             }
         }
@@ -166,6 +205,15 @@ fun SynopsisScreenPreview() {
             reviews = 3876,
             description = "Un aristócrata de diecisiete años se enamora de un artista bondadoso pero pobre a bordo del lujoso R.M.S. Titanic."
         )
-        SynopsisScreen(movie = sample, onBackClick = {})
+        SynopsisScreenContent(
+            uiState = SynopsisUIState(
+                movie = sample,
+                cast = listOf(
+                    CastMember("Leonardo DiCaprio", "Jack Dawson", true),
+                    CastMember("Kate Winslet", "Rose DeWitt Bukater", true)
+                )
+            ),
+            onBackClick = {}
+        )
     }
 }

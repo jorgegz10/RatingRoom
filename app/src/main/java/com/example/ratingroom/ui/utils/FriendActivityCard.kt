@@ -84,7 +84,7 @@ fun ActivityHeader(
         }
 
         Text(
-            text = activity.timeAgo,
+            text = activity.timestamp,
             fontSize = 12.sp,
             color = Color.Gray
         )
@@ -116,25 +116,27 @@ fun ActivityMovieInfo(
                 color = Color.Black
             )
             
-            if (activity.rating > 0) {
+            activity.rating?.let { rating ->
                 Spacer(modifier = Modifier.height(4.dp))
                 StarRating(
-                    rating = activity.rating,
+                    rating = rating.toDouble(),
                     starSize = 16.dp,
                     showText = true
                 )
             }
             
-            if (activity.comment.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "\"${activity.comment}\"",
-                    fontSize = 12.sp,
-                    color = Color.DarkGray,
-                    lineHeight = 16.sp,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
+            activity.comment?.let { comment ->
+                if (comment.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "\"$comment\"",
+                        fontSize = 12.sp,
+                        color = Color.DarkGray,
+                        lineHeight = 16.sp,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }

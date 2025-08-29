@@ -1,4 +1,4 @@
-package com.example.ratingroom.ui.screens
+package com.example.ratingroom.ui.screens.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ratingroom.R
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.*
@@ -23,20 +24,41 @@ import com.example.ratingroom.ui.utils.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
-    displayName: String,
+    onSave: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: EditProfileViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    
+    EditProfileScreenContent(
+        uiState = uiState,
+        onDisplayNameChange = viewModel::onDisplayNameChange,
+        onEmailChange = viewModel::onEmailChange,
+        onBiographyChange = viewModel::onBiographyChange,
+        onLocationChange = viewModel::onLocationChange,
+        onFavoriteGenreChange = viewModel::onFavoriteGenreChange,
+        onBirthdateChange = viewModel::onBirthdateChange,
+        onWebsiteChange = viewModel::onWebsiteChange,
+        onSave = {
+            viewModel.saveProfile()
+            onSave()
+        },
+        modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditProfileScreenContent(
+    uiState: EditProfileUIState,
     onDisplayNameChange: (String) -> Unit,
-    email: String,
     onEmailChange: (String) -> Unit,
-    biography: String,
     onBiographyChange: (String) -> Unit,
-    location: String,
     onLocationChange: (String) -> Unit,
-    favoriteGenre: String,
     onFavoriteGenreChange: (String) -> Unit,
-    birthdate: String,
     onBirthdateChange: (String) -> Unit,
-    website: String,
     onWebsiteChange: (String) -> Unit,
+    onSave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val genres = listOf("Sci-Fi", "Acción", "Drama", "Comedia", "Terror", "Romance")
@@ -92,8 +114,8 @@ fun EditProfileScreen(
                 title = stringResource(id = R.string.personal_info_title)
             ) {
                 TextInputField(
-                    value = displayName,
-                    onValueChange = onDisplayNameChange,
+                    value = uiState.displayName,
+                onValueChange = onDisplayNameChange,
                     label = stringResource(id = R.string.display_name_label),
                     placeholder = stringResource(id = R.string.display_name_placeholder)
                 )
@@ -101,8 +123,8 @@ fun EditProfileScreen(
                 Spacer(Modifier.height(16.dp))
 
                 EmailField(
-                    value = email,
-                    onValueChange = onEmailChange,
+                    value = uiState.email,
+                onValueChange = onEmailChange,
                     label = stringResource(id = R.string.email_label),
                     placeholder = stringResource(id = R.string.email_placeholder)
                 )
@@ -110,8 +132,8 @@ fun EditProfileScreen(
                 Spacer(Modifier.height(16.dp))
 
                 TextInputField(
-                    value = biography,
-                    onValueChange = onBiographyChange,
+                    value = uiState.biography,
+                onValueChange = onBiographyChange,
                     label = stringResource(id = R.string.biography_label),
                     placeholder = stringResource(id = R.string.biography_placeholder)
                 )
@@ -119,8 +141,8 @@ fun EditProfileScreen(
                 Spacer(Modifier.height(16.dp))
 
                 TextInputField(
-                    value = location,
-                    onValueChange = onLocationChange,
+                    value = uiState.location,
+                onValueChange = onLocationChange,
                     label = stringResource(id = R.string.location_label),
                     placeholder = stringResource(id = R.string.location_placeholder)
                 )
@@ -133,8 +155,8 @@ fun EditProfileScreen(
                 title = stringResource(id = R.string.preferences_title)
             ) {
                 DropdownField(
-                    value = favoriteGenre,
-                    onValueChange = onFavoriteGenreChange,
+                    value = uiState.favoriteGenre,
+                onValueChange = onFavoriteGenreChange,
                     label = stringResource(id = R.string.favorite_genre_label),
                     options = genres
                 )
@@ -142,16 +164,16 @@ fun EditProfileScreen(
                 Spacer(Modifier.height(16.dp))
 
                 DatePickerField(
-                    value = birthdate,
-                    onValueChange = onBirthdateChange,
+                    value = uiState.birthdate,
+                onValueChange = onBirthdateChange,
                     label = stringResource(id = R.string.birthdate_label)
                 )
 
                 Spacer(Modifier.height(16.dp))
 
                 TextInputField(
-                    value = website,
-                    onValueChange = onWebsiteChange,
+                    value = uiState.website,
+                onValueChange = onWebsiteChange,
                     label = stringResource(id = R.string.website_label),
                     placeholder = stringResource(id = R.string.website_placeholder),
                     keyboardType = KeyboardType.Uri
@@ -162,9 +184,9 @@ fun EditProfileScreen(
 
             CustomButton(
                 text = stringResource(id = R.string.save_changes),
-                onClick = { /* Guardar cambios */ },
-                backgroundColor = cs.primary,                           // antes: Color.Black
-                textColor = cs.onPrimary,                               // antes: Color.White
+                onClick = onSave,
+                backgroundColor = cs.primary,
+                textColor = cs.onPrimary,
                 modifier = Modifier.height(56.dp)
             )
         }
@@ -175,21 +197,24 @@ fun EditProfileScreen(
 @Composable
 fun PreviewEditProfileScreen() {
     RatingRoomTheme {
-        EditProfileScreen(
-            displayName = "",
+        EditProfileScreenContent(
+            uiState = EditProfileUIState(
+                displayName = "Pedro",
+                email = "pedro@correo.com",
+                biography = "Amante del cine y las buenas historias.",
+                location = "Madrid, España",
+                favoriteGenre = "Sci-Fi",
+                birthdate = "15/03/1990",
+                website = "https://miweb.com"
+            ),
             onDisplayNameChange = {},
-            email = "",
             onEmailChange = {},
-            biography = "",
             onBiographyChange = {},
-            location = "",
             onLocationChange = {},
-            favoriteGenre = "Género Favorito",
             onFavoriteGenreChange = {},
-            birthdate = "mm / dd / yyyy",
             onBirthdateChange = {},
-            website = "",
-            onWebsiteChange = {}
+            onWebsiteChange = {},
+            onSave = {}
         )
     }
 }
