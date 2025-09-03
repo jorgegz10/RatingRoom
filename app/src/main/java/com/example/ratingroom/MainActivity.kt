@@ -5,8 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
@@ -98,9 +103,11 @@ fun RatingRoomApp() {
     }
 
     GradientBackground {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars.only(
+            WindowInsetsSides.Horizontal)) ) {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
+
                 topBar = {
                     if (currentScreen in screensWithDrawer && currentScreen !in Screen.authScreens) {
                         ModernTopBar(
@@ -109,7 +116,8 @@ fun RatingRoomApp() {
                         )
                     }
                 },
-                containerColor = Color.Transparent
+                containerColor = Color.Transparent,
+                contentWindowInsets = WindowInsets(0,0,0,0)
             ) { innerPadding ->
 
                 NavHost(

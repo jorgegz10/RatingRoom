@@ -93,7 +93,7 @@ fun MainMenuScreenContent(
                 stringResource(id = R.string.main_menu_popular_movies),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = cs.onPrimary // antes: Color.White
+                color = cs.tertiary
             )
 
             Spacer(modifier = Modifier.height(12.dp))
