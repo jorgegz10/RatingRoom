@@ -2,6 +2,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.dagger)
+    alias(libs.plugins.google.ksp)
+    id("kotlin-kapt")
+    id("com.google.gms.google-services")
+    alias(libs.plugins.firebase.crashlytics)
+
 }
 
 android {
@@ -44,7 +50,18 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-
+   // implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+    // implementation("com.google.firebase:firebase-analytics")
+    //Hilt
+    implementation(libs.dagger.hilt)
+    implementation(libs.hilt.compose.navigation)
+    kapt(libs.dagger.kapt)
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
     // Compose BOM
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

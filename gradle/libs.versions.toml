@@ -8,8 +8,20 @@ espressoCore = "3.7.0"
 lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
 composeBom = "2024.09.00"
+googleServices = "4.4.2"
+googleKotlinKsp = "2.0.21-1.0.25"
+firebaseCrashlytics = "3.0.2"
+firebaseBom = "33.7.0"
 
 [libraries]
+dagger-hilt = { module = "com.google.dagger:hilt-android", version = "2.52" }
+dagger-kapt = { module = "com.google.dagger:hilt-android-compiler", version = "2.52" }
+hilt-compose-navigation = { module = "androidx.hilt:hilt-navigation-compose", version = "1.2.0" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref ="firebaseBom" }
+firebase-auth = { module = "com.google.firebase:firebase-auth" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -29,4 +41,8 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-
+dagger = { id = "com.google.dagger.hilt.android", version = "2.50" }
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "googleKotlinKsp" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
