@@ -3,12 +3,15 @@ package com.example.ratingroom.ui.screens.moviedetail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ratingroom.data.repository.MovieRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class MovieDetailViewModel : ViewModel() {
+@HiltViewModel
+class MovieDetailViewModel @Inject constructor() : ViewModel() {
     
     private val _uiState = MutableStateFlow(MovieDetailUIState())
     val uiState: StateFlow<MovieDetailUIState> = _uiState.asStateFlow()

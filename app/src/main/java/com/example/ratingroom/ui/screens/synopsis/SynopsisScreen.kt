@@ -14,7 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ratingroom.data.models.Movie
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.AppTopBar
@@ -26,7 +26,7 @@ fun SynopsisScreen(
     movieId: Int,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SynopsisViewModel = viewModel()
+    viewModel: SynopsisViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     

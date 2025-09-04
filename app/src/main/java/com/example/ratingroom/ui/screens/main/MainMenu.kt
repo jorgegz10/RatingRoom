@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ratingroom.ui.utils.*
 import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.data.models.Movie
@@ -23,7 +23,7 @@ import com.example.ratingroom.ui.theme.RatingRoomTheme
 fun MainMenuScreen(
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MainMenuViewModel = viewModel()
+    viewModel: MainMenuViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     

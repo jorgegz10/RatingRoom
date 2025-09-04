@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ratingroom.ui.utils.*
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.data.repository.FriendsRepository
@@ -33,7 +33,7 @@ import com.example.ratingroom.data.models.FriendshipType
 fun FriendsScreen(
     onBack: () -> Unit = {},
     modifier: Modifier = Modifier,
-    viewModel: FriendsViewModel = viewModel()
+    viewModel: FriendsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

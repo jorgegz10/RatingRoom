@@ -30,8 +30,8 @@ import com.example.ratingroom.navigation.Screen
 fun ModernNavigationDrawer(
     isOpen: Boolean,
     onToggle: () -> Unit,
-    currentScreen: Screen,
-    onNavigate: (Screen) -> Unit,
+    currentRoute: String?,
+    onNavigate: (String) -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -94,7 +94,7 @@ fun ModernNavigationDrawer(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     NavigationItems(
-                        currentScreen = currentScreen,
+                        currentRoute = currentRoute,
                         onNavigate = onNavigate,
                         alpha = animatedAlpha
                     )
@@ -195,8 +195,8 @@ private fun DrawerHeader(
 
 @Composable
 private fun NavigationItems(
-    currentScreen: Screen,
-    onNavigate: (Screen) -> Unit,
+    currentRoute: String?,
+    onNavigate: (String) -> Unit,
     alpha: Float
 ) {
     Column(
@@ -205,8 +205,8 @@ private fun NavigationItems(
         Screen.mainScreens.forEach { screen ->
             NavigationDrawerItem(
                 screen = screen,
-                isSelected = currentScreen.route == screen.route,
-                onClick = { onNavigate(screen) }
+                isSelected = currentRoute == screen.route,
+                onClick = { onNavigate(screen.route) }
             )
             Spacer(modifier = Modifier.height(4.dp))
         }

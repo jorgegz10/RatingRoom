@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ratingroom.data.models.Movie
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.AppTopBar
@@ -22,7 +22,7 @@ fun FavoritesScreen(
     onBack: () -> Unit = {},
     onMovieClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FavoritesViewModel = viewModel()
+    viewModel: FavoritesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
