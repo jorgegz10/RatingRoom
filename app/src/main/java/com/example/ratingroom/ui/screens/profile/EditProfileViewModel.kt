@@ -2,13 +2,18 @@ package com.example.ratingroom.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ratingroom.data.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 
-class EditProfileViewModel : ViewModel() {
+@HiltViewModel
+class EditProfileViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(EditProfileUIState())
     val uiState: StateFlow<EditProfileUIState> = _uiState.asStateFlow()
@@ -22,23 +27,29 @@ class EditProfileViewModel : ViewModel() {
             _uiState.value = _uiState.value.copy(isLoading = true)
             
             try {
-                delay(1000) // Simular carga
+                val userProfile = authRepository.getUserProfile()
                 
-                // Cargar datos actuales del perfil
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    displayName = "Usuario Demo",
-                    email = "usuario@demo.com",
-                    biography = "Amante del cine y las buenas historias.",
-                    location = "Ciudad de México",
-                    favoriteGenre = "Acción",
-                    birthdate = "01/01/1990",
-                    website = "https://miwebsite.com"
-                )
+                if (userProfile != null) {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        displayName = userProfile.fullName ?: "",
+                        email = userProfile.email,
+                        biography = userProfile.biography ?: "",
+                        location = userProfile.location ?: "",
+                        favoriteGenre = userProfile.favoriteGenre ?: "",
+                        birthdate = userProfile.birthdate ?: "",
+                        website = userProfile.website ?: ""
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = "No se pudo cargar el perfil"
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message
+                    errorMessage = e.message ?: "Error al cargar perfil"
                 )
             }
         }
@@ -118,13 +129,28 @@ class EditProfileViewModel : ViewModel() {
                     }
                 }
                 
-                // Simular guardado
-                delay(2000)
-                
-                _uiState.value = _uiState.value.copy(
-                    isSaving = false,
-                    successMessage = "Perfil actualizado exitosamente"
+                // Guardar perfil usando AuthRepository
+                val result = authRepository.updateUserProfile(
+                    displayName = currentState.displayName,
+                    email = currentState.email,
+                    biography = currentState.biography,
+                    location = currentState.location,
+                    favoriteGenre = currentState.favoriteGenre,
+                    birthdate = currentState.birthdate,
+                    website = currentState.website
                 )
+                
+                if (result.isSuccess) {
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        successMessage = "Perfil actualizado exitosamente"
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        errorMessage = result.errorMessage ?: "Error al actualizar perfil"
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,

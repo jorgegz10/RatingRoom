@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ratingroom.data.models.Review
 import com.example.ratingroom.ui.utils.MoviePoster
 
@@ -34,7 +34,7 @@ import com.example.ratingroom.ui.utils.MoviePoster
 fun MovieDetailRoute(
     movieId: Int,
     onBack: () -> Unit,
-    viewModel: MovieDetailViewModel = viewModel()
+    viewModel: MovieDetailViewModel = hiltViewModel()
 ) {
     LaunchedEffect(movieId) { viewModel.loadMovieDetail(movieId) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

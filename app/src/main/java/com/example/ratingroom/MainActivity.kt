@@ -41,7 +41,9 @@ import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.GradientBackground
 import com.example.ratingroom.ui.utils.ModernNavigationDrawer
 import com.example.ratingroom.ui.utils.ModernTopBar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,41 +67,42 @@ fun RatingRoomApp() {
     }
 
     val navigateBack: () -> Unit = {
-        if (!navController.popBackStack()) {
+        println("MainActivity: navigateBack() iniciado")
+        val popped = navController.popBackStack()
+        println("MainActivity: popBackStack() resultado: $popped")
+        if (!popped) {
+            println("MainActivity: No se pudo hacer pop, navegando a MainMenu")
             navController.navigate(Screen.MainMenu.route) {
                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
             }
         }
         isDrawerOpen = false
+        println("MainActivity: navigateBack() completado")
     }
 
-    val currentScreen = when {
-        currentRoute == Screen.Login.route -> Screen.Login
-        currentRoute == Screen.Register.route -> Screen.Register
-        currentRoute == Screen.ForgotPassword.route -> Screen.ForgotPassword
-        currentRoute == Screen.MainMenu.route -> Screen.MainMenu
-        currentRoute == Screen.Profile.route -> Screen.Profile
-        currentRoute == Screen.EditProfile.route -> Screen.EditProfile
-        currentRoute == Screen.Friends.route -> Screen.Friends
-        currentRoute == Screen.Favorites.route -> Screen.Favorites
-        currentRoute == Screen.Settings.route -> Screen.Settings
-        currentRoute == Screen.List.route -> Screen.List
-        currentRoute == Screen.Reviews.route -> Screen.Reviews
-        currentRoute?.startsWith("movie_detail/") == true -> Screen.MovieDetail
-        currentRoute?.startsWith("synopsis/") == true -> Screen.Synopsis
-        else -> Screen.MainMenu
-    }
+    // Determinar si mostrar drawer y topbar basado en la ruta actual
+    val isAuthScreen = currentRoute in listOf(
+        Screen.Login.route,
+        Screen.Register.route,
+        Screen.ForgotPassword.route
+    )
+    
+    val showTopBar = !isAuthScreen
+    val showDrawer = !isAuthScreen
 
-    val screensWithDrawer = remember {
-        listOf(
-            Screen.MainMenu,
-            Screen.Profile,   // Perfil usa ModernTopBar con logo/menú
-            Screen.Friends,
-            Screen.List,
-            Screen.Reviews,
-            Screen.Favorites,
-            Screen.Settings
-        )
+    // Obtener el título de la pantalla actual
+    val currentTitle = when {
+        currentRoute == Screen.MainMenu.route -> Screen.MainMenu.title
+        currentRoute == Screen.Profile.route -> Screen.Profile.title
+        currentRoute == Screen.Friends.route -> Screen.Friends.title
+        currentRoute == Screen.List.route -> Screen.List.title
+        currentRoute == Screen.Reviews.route -> Screen.Reviews.title
+        currentRoute == Screen.Favorites.route -> Screen.Favorites.title
+        currentRoute == Screen.Settings.route -> Screen.Settings.title
+        currentRoute == Screen.EditProfile.route -> Screen.EditProfile.title
+        currentRoute?.startsWith("movie_detail/") == true -> Screen.MovieDetail.title
+        currentRoute?.startsWith("synopsis/") == true -> Screen.Synopsis.title
+        else -> "RatingRoom"
     }
 
     GradientBackground {
@@ -109,9 +112,9 @@ fun RatingRoomApp() {
                 modifier = Modifier.fillMaxSize(),
 
                 topBar = {
-                    if (currentScreen in screensWithDrawer && currentScreen !in Screen.authScreens) {
+                    if (showTopBar) {
                         ModernTopBar(
-                            title = currentScreen.title,
+                            title = currentTitle,
                             onMenuClick = { isDrawerOpen = true }
                         )
                     }
@@ -129,6 +132,8 @@ fun RatingRoomApp() {
                     composable(Screen.Login.route) {
                         LoginScreen(
                             onLoginClick = { _, _ ->
+                                // Solo navegar si el login fue exitoso
+                                // El LoginViewModel ya maneja la validación con Firebase
                                 navController.navigate(Screen.MainMenu.route) {
                                     popUpTo(Screen.Login.route) { inclusive = true }
                                 }
@@ -139,9 +144,19 @@ fun RatingRoomApp() {
                     }
                     composable(Screen.Register.route) {
                         RegisterScreen(
-                            onRegisterClick = { _, _, _, _, _, _ -> navigateBack() },
-                            onLoginClick = { navigateBack() },
-                            onBackClick = { navigateBack() }
+                            onRegisterClick = { _, _, _, _, _, _ -> 
+                                println("MainActivity: onRegisterClick ejecutado, llamando navigateBack()")
+                                navigateBack()
+                                println("MainActivity: navigateBack() ejecutado")
+                            },
+                            onLoginClick = { 
+                                println("MainActivity: onLoginClick ejecutado")
+                                navigateBack() 
+                            },
+                            onBackClick = { 
+                                println("MainActivity: onBackClick ejecutado")
+                                navigateBack() 
+                            }
                         )
                     }
                     composable(Screen.ForgotPassword.route) {
@@ -214,12 +229,12 @@ fun RatingRoomApp() {
                 }
             }
 
-            if (currentScreen !in Screen.authScreens) {
+            if (showDrawer) {
                 ModernNavigationDrawer(
                     isOpen = isDrawerOpen,
                     onToggle = { isDrawerOpen = !isDrawerOpen },
-                    currentScreen = currentScreen,
-                    onNavigate = { screen -> navigateToScreen(screen.route) },
+                    currentRoute = currentRoute,
+                    onNavigate = { route -> navigateToScreen(route) },
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }

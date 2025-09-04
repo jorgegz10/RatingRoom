@@ -4,12 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ratingroom.data.repository.MovieRepository
 import com.example.ratingroom.ui.screens.synopsis.CastMember
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class SynopsisViewModel : ViewModel() {
+@HiltViewModel
+class SynopsisViewModel @Inject constructor() : ViewModel() {
     
     private val _uiState = MutableStateFlow(SynopsisUIState())
     val uiState: StateFlow<SynopsisUIState> = _uiState.asStateFlow()

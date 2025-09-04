@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ratingroom.R
 import com.example.ratingroom.ui.theme.*
 import com.example.ratingroom.ui.utils.*
@@ -29,7 +29,7 @@ fun RegisterScreen(
     onLoginClick: () -> Unit = {},
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier,
-    viewModel: RegisterViewModel = viewModel()
+    viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
@@ -43,14 +43,18 @@ fun RegisterScreen(
         onBirthYearChange = viewModel::onBirthYearChange,
         onAcceptTermsChange = viewModel::onAcceptTermsChange,
         onRegisterClick = {
-            onRegisterClick(
-                uiState.fullName,
-                uiState.email,
-                uiState.password,
-                uiState.confirmPassword,
-                uiState.favoriteGenre,
-                uiState.birthYear
-            )
+            viewModel.register {
+                println("RegisterScreen: Callback onSuccess ejecutado, llamando onRegisterClick")
+                onRegisterClick(
+                    uiState.fullName,
+                    uiState.email,
+                    uiState.password,
+                    uiState.confirmPassword,
+                    uiState.favoriteGenre,
+                    uiState.birthYear
+                )
+                println("RegisterScreen: onRegisterClick ejecutado")
+            }
         },
         onLoginClick = onLoginClick,
         onBackClick = onBackClick,
@@ -214,12 +218,49 @@ fun RegisterScreenContent(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Mensaje de error
+                if (uiState.errorMessage != null) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Text(
+                            text = uiState.errorMessage,
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            fontSize = 14.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
+                // Mensaje de éxito
+                if (uiState.successMessage != null) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Text(
+                            text = uiState.successMessage,
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            fontSize = 14.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 // Botón de registro
                 CustomButton(
                     text = stringResource(id = R.string.register_button),
                     onClick = onRegisterClick,
                     backgroundColor = cs.primary,
-                    textColor = cs.onPrimary
+                    textColor = cs.onPrimary,
+                    isLoading = uiState.isLoading
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ratingroom.ui.utils.AppTopBar
 import com.example.ratingroom.ui.utils.TopBarConfig
 import com.example.ratingroom.ui.utils.EmptyActivityState
@@ -19,7 +19,7 @@ import com.example.ratingroom.ui.theme.RatingRoomTheme
 fun ReviewsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ReviewsViewModel = viewModel()
+    viewModel: ReviewsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
