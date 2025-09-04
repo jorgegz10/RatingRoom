@@ -67,12 +67,17 @@ fun RatingRoomApp() {
     }
 
     val navigateBack: () -> Unit = {
-        if (!navController.popBackStack()) {
+        println("MainActivity: navigateBack() iniciado")
+        val popped = navController.popBackStack()
+        println("MainActivity: popBackStack() resultado: $popped")
+        if (!popped) {
+            println("MainActivity: No se pudo hacer pop, navegando a MainMenu")
             navController.navigate(Screen.MainMenu.route) {
                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
             }
         }
         isDrawerOpen = false
+        println("MainActivity: navigateBack() completado")
     }
 
     // Determinar si mostrar drawer y topbar basado en la ruta actual
@@ -127,6 +132,8 @@ fun RatingRoomApp() {
                     composable(Screen.Login.route) {
                         LoginScreen(
                             onLoginClick = { _, _ ->
+                                // Solo navegar si el login fue exitoso
+                                // El LoginViewModel ya maneja la validación con Firebase
                                 navController.navigate(Screen.MainMenu.route) {
                                     popUpTo(Screen.Login.route) { inclusive = true }
                                 }
@@ -137,9 +144,19 @@ fun RatingRoomApp() {
                     }
                     composable(Screen.Register.route) {
                         RegisterScreen(
-                            onRegisterClick = { _, _, _, _, _, _ -> navigateBack() },
-                            onLoginClick = { navigateBack() },
-                            onBackClick = { navigateBack() }
+                            onRegisterClick = { _, _, _, _, _, _ -> 
+                                println("MainActivity: onRegisterClick ejecutado, llamando navigateBack()")
+                                navigateBack()
+                                println("MainActivity: navigateBack() ejecutado")
+                            },
+                            onLoginClick = { 
+                                println("MainActivity: onLoginClick ejecutado")
+                                navigateBack() 
+                            },
+                            onBackClick = { 
+                                println("MainActivity: onBackClick ejecutado")
+                                navigateBack() 
+                            }
                         )
                     }
                     composable(Screen.ForgotPassword.route) {

@@ -2,16 +2,20 @@ package com.example.ratingroom.ui.screens.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ratingroom.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor() : ViewModel() {
+class RegisterViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(RegisterUIState())
     val uiState: StateFlow<RegisterUIState> = _uiState.asStateFlow()
@@ -86,7 +90,7 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
         )
     }
     
-    fun register() {
+    fun register(onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
             
@@ -95,10 +99,10 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
                 val currentState = _uiState.value
                 
                 when {
-                    currentState.username.isBlank() -> {
+                    currentState.fullName.isBlank() -> {
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            errorMessage = "El nombre de usuario es requerido"
+                            errorMessage = "El nombre completo es requerido"
                         )
                         return@launch
                     }
@@ -125,13 +129,42 @@ class RegisterViewModel @Inject constructor() : ViewModel() {
                     }
                 }
                 
-                // Simular registro
-                delay(2000)
+                // Preparar campos opcionales (solo si no están vacíos)
+                val favoriteGenre = if (currentState.favoriteGenre.isNotBlank()) {
+                    currentState.favoriteGenre
+                } else null
                 
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    successMessage = "Registro exitoso"
+                val birthYear = if (currentState.birthYear.isNotBlank()) {
+                    currentState.birthYear
+                } else null
+                
+                // Realizar registro usando AuthRepository
+                println("RegisterViewModel: Iniciando registro")
+                val result = authRepository.signUp(
+                    email = currentState.email,
+                    password = currentState.password,
+                    fullName = currentState.fullName,
+                    favoriteGenre = favoriteGenre,
+                    birthYear = birthYear
                 )
+                
+                println("RegisterViewModel: Resultado recibido - isSuccess: ${result.isSuccess}")
+                if (result.isSuccess) {
+                    println("RegisterViewModel: Registro exitoso, actualizando UI y llamando onSuccess")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        successMessage = "Registro exitoso"
+                    )
+                    println("RegisterViewModel: Antes de llamar onSuccess")
+                    onSuccess()
+                    println("RegisterViewModel: onSuccess() ejecutado")
+                } else {
+                    println("RegisterViewModel: Registro falló - ${result.errorMessage}")
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = result.errorMessage ?: "Error al crear cuenta"
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,

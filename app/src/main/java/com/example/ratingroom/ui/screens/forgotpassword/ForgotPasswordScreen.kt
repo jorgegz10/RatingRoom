@@ -35,7 +35,11 @@ fun ForgotPasswordScreen(
     ForgotPasswordScreenContent(
         uiState = uiState,
         onEmailChange = viewModel::onEmailChange,
-        onSendRecoveryClick = { onSendRecoveryClick(uiState.email) },
+        onSendRecoveryClick = { 
+            viewModel.sendRecoveryEmail {
+                onSendRecoveryClick(uiState.email)
+            }
+        },
         onBackToLoginClick = onBackToLoginClick,
         onShowHowItWorksChange = viewModel::onShowHowItWorksChange,
         modifier = modifier

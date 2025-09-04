@@ -32,7 +32,11 @@ fun LoginScreen(
         uiState = uiState,
         onEmailChange = viewModel::onUsernameChange,
         onPasswordChange = viewModel::onPasswordChange,
-        onLoginClick = { onLoginClick(uiState.username, uiState.password) },
+        onLoginClick = { 
+            viewModel.login {
+                onLoginClick(uiState.username, uiState.password)
+            }
+        },
         onRegisterClick = onRegisterClick,
         onForgotPasswordClick = onForgotPasswordClick,
         modifier = modifier
@@ -111,10 +115,29 @@ fun LoginScreenContent(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Mensaje de error
+                if (uiState.errorMessage != null) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Text(
+                            text = uiState.errorMessage,
+                            modifier = Modifier.padding(16.dp),
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            fontSize = 14.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 // Botón de iniciar sesión
                 CustomButton(
                     text = stringResource(id = R.string.login_button),
-                    onClick = onLoginClick
+                    onClick = onLoginClick,
+                    isLoading = uiState.isLoading
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

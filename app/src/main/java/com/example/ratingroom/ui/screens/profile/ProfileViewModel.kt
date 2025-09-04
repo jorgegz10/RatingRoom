@@ -2,16 +2,18 @@ package com.example.ratingroom.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ratingroom.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor() : ViewModel() {
+class ProfileViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
     
     private val _uiState = MutableStateFlow(ProfileUIState())
     val uiState: StateFlow<ProfileUIState> = _uiState.asStateFlow()
@@ -25,25 +27,32 @@ class ProfileViewModel @Inject constructor() : ViewModel() {
             _uiState.value = _uiState.value.copy(isLoading = true)
             
             try {
-                delay(1000) // Simular carga
+                val userProfile = authRepository.getUserProfile()
                 
-                val profileData = ProfileData(
-                    name = "Usuario Demo",
-                    email = "usuario@demo.com",
-                    memberSince = "Enero 2024",
-                    favoriteGenre = "Acción",
-                    reviewsCount = 25,
-                    averageRating = 4.2
-                )
-                
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    profileData = profileData
-                )
+                if (userProfile != null) {
+                    val profileData = ProfileData(
+                        name = userProfile.fullName ?: "Usuario",
+                        email = userProfile.email,
+                        memberSince = "Enero 2024", // Podrías calcular esto desde createdAt
+                        favoriteGenre = userProfile.favoriteGenre ?: "No especificado",
+                        reviewsCount = 0, // Esto vendría de otra fuente
+                        averageRating = 0.0 // Esto vendría de otra fuente
+                    )
+                    
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        profileData = profileData
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMessage = "No se pudo cargar el perfil"
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message
+                    errorMessage = e.message ?: "Error al cargar perfil"
                 )
             }
         }

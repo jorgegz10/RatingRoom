@@ -16,10 +16,12 @@ fun CustomButton(
     onClick: () -> Unit,
     backgroundColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary,
     textColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onPrimary,
+    isLoading: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
+        enabled = !isLoading,
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp),
@@ -28,11 +30,18 @@ fun CustomButton(
         ),
         shape = RoundedCornerShape(8.dp)
     ) {
-        Text(
-            text = text,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = textColor
-        )
+        if (isLoading) {
+            CircularProgressIndicator(
+                color = textColor,
+                modifier = Modifier.height(20.dp)
+            )
+        } else {
+            Text(
+                text = text,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = textColor
+            )
+        }
     }
 }
