@@ -1,6 +1,11 @@
 package com.example.ratingroom.ui.screens.profile
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -10,15 +15,22 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.ratingroom.R
 import com.example.ratingroom.ui.theme.RatingRoomTheme
 import com.example.ratingroom.ui.utils.*
@@ -32,7 +44,61 @@ fun EditProfileScreen(
     viewModel: EditProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    
+    // Estado para controlar la visibilidad del diálogo de confirmación
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    
+    // Launcher para seleccionar imagen de la galería
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { 
+            println("URI seleccionada en EditProfileScreen: $it")
+            println("URI scheme: ${it.scheme}, path: ${it.path}")
+            viewModel.onProfileImageSelected(it)
+            // Guardar automáticamente cuando se selecciona una imagen
+            viewModel.saveProfile()
+        }
+    }
 
+    // Diálogo de confirmación para salir sin guardar
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            title = { Text("¿Salir sin guardar?") },
+            text = { Text("Los cambios no guardados se perderán.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showConfirmDialog = false
+                        onBackClick()
+                    }
+                ) {
+                    Text("Salir")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showConfirmDialog = false }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+    
+    // Función para manejar el botón de retroceso
+    val handleBackClick = {
+        // Si hay una imagen seleccionada, guardar automáticamente
+        if (uiState.profileImageUri != null) {
+            viewModel.saveProfile()
+            onSave()
+        } else {
+            // Si hay otros cambios, mostrar diálogo de confirmación
+            showConfirmDialog = true
+        }
+    }
+    
     EditProfileScreenContent(
         uiState = uiState,
         onDisplayNameChange = viewModel::onDisplayNameChange,
@@ -42,11 +108,12 @@ fun EditProfileScreen(
         onFavoriteGenreChange = viewModel::onFavoriteGenreChange,
         onBirthdateChange = viewModel::onBirthdateChange,
         onWebsiteChange = viewModel::onWebsiteChange,
+        onSelectImage = { galleryLauncher.launch("image/*") },
         onSave = {
             viewModel.saveProfile()
             onSave()
         },
-        onBackClick = onBackClick,
+        onBackClick = handleBackClick,
         modifier = modifier
     )
 }
@@ -62,6 +129,7 @@ fun EditProfileScreenContent(
     onFavoriteGenreChange: (String) -> Unit,
     onBirthdateChange: (String) -> Unit,
     onWebsiteChange: (String) -> Unit,
+    onSelectImage: () -> Unit,
     onSave: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -101,13 +169,30 @@ fun EditProfileScreenContent(
                     modifier = Modifier.size(100.dp),
                     contentAlignment = Alignment.BottomEnd
                 ) {
-                    Surface(
-                        shape = CircleShape,
-                        color = cs.surfaceVariant,
-                        modifier = Modifier.size(100.dp)
-                    ) { Box(Modifier.fillMaxSize()) }
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(CircleShape)
+                            .background(cs.surfaceVariant)
+                            .border(2.dp, cs.primary, CircleShape)
+                            .clickable(onClick = onSelectImage)
+                    ) {
+                        if (uiState.profileImageUri != null) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(uiState.profileImageUri)
+                                    .crossfade(true)
+                                    .build(),
+                                contentDescription = stringResource(id = R.string.profile_image),
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        } else {
+                            Box(Modifier.fillMaxSize())
+                        }
+                    }
                     IconButton(
-                        onClick = {},
+                        onClick = onSelectImage,
                         modifier = Modifier
                             .size(32.dp)
                             .background(cs.primary, CircleShape)
@@ -220,7 +305,8 @@ fun PreviewEditProfileScreen() {
                 location = "Madrid, España",
                 favoriteGenre = "Sci-Fi",
                 birthdate = "15/03/1990",
-                website = "https://miweb.com"
+                website = "https://miweb.com",
+                profileImageUri = null
             ),
             onDisplayNameChange = {},
             onEmailChange = {},
@@ -229,6 +315,7 @@ fun PreviewEditProfileScreen() {
             onFavoriteGenreChange = {},
             onBirthdateChange = {},
             onWebsiteChange = {},
+            onSelectImage = {},
             onSave = {},
             onBackClick = {}
         )

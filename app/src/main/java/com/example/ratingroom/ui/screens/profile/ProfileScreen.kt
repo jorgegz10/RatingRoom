@@ -124,7 +124,11 @@ fun ProfileHeader(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AvatarInitials(initials = profileData.name.take(2).uppercase())
+            println("ProfileHeader: Mostrando perfil con nombre: ${profileData.name}, imageUrl: ${profileData.profileImageUrl}")
+            AvatarInitials(
+                initials = profileData.name.take(2).uppercase(),
+                imageUrl = profileData.profileImageUrl
+            )
             Spacer(Modifier.height(12.dp))
             Text(
                 text = profileData.name,
@@ -258,7 +262,8 @@ fun ProfileScreenPreview() {
                     memberSince = "Enero 2024",
                     favoriteGenre = "Sci-Fi",
                     reviewsCount = 3,
-                    averageRating = 4.7
+                    averageRating = 4.7,
+                    profileImageUrl = null
                 ),
                 isDarkMode = false,
                 isLoading = false

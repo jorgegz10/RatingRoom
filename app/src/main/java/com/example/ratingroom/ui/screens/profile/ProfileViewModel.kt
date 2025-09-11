@@ -25,31 +25,41 @@ class ProfileViewModel @Inject constructor(
     private fun loadProfile() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
+            println("ProfileViewModel.loadProfile: Iniciando carga de perfil")
             
             try {
                 val userProfile = authRepository.getUserProfile()
+                println("ProfileViewModel.loadProfile: Perfil recibido de AuthRepository: ${userProfile != null}")
                 
                 if (userProfile != null) {
+                    println("ProfileViewModel.loadProfile: Perfil cargado con éxito")
+                    println("ProfileViewModel.loadProfile: profileImageUrl: ${userProfile.profileImageUrl}")
+                    
                     val profileData = ProfileData(
                         name = userProfile.fullName ?: "Usuario",
                         email = userProfile.email,
                         memberSince = "Enero 2024", // Podrías calcular esto desde createdAt
                         favoriteGenre = userProfile.favoriteGenre ?: "No especificado",
                         reviewsCount = 0, // Esto vendría de otra fuente
-                        averageRating = 0.0 // Esto vendría de otra fuente
+                        averageRating = 0.0, // Esto vendría de otra fuente
+                        profileImageUrl = userProfile.profileImageUrl
                     )
                     
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         profileData = profileData
                     )
+                    println("ProfileViewModel.loadProfile: Estado actualizado con profileImageUrl: ${_uiState.value.profileData?.profileImageUrl}")
                 } else {
+                    println("ProfileViewModel.loadProfile: No se pudo cargar el perfil")
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         errorMessage = "No se pudo cargar el perfil"
                     )
                 }
             } catch (e: Exception) {
+                println("ProfileViewModel.loadProfile: ERROR al cargar perfil: ${e.message}")
+                e.printStackTrace()
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     errorMessage = e.message ?: "Error al cargar perfil"

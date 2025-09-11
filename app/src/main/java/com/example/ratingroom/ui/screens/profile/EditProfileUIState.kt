@@ -8,6 +8,7 @@ data class EditProfileUIState(
     val favoriteGenre: String = "Género Favorito",
     val birthdate: String = "mm / dd / yyyy",
     val website: String = "",
+    val profileImageUri: String? = null,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val errorMessage: String? = null,

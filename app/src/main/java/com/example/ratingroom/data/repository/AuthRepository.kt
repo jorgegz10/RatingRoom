@@ -21,6 +21,7 @@ data class UserProfile(
     val location: String? = null,
     val birthdate: String? = null,
     val website: String? = null,
+    val profileImageUrl: String? = null,
     val createdAt: Long? = null,
     val updatedAt: Long? = null
 )
@@ -99,7 +100,8 @@ class AuthRepository @Inject constructor(
         location: String? = null,
         favoriteGenre: String? = null,
         birthdate: String? = null,
-        website: String? = null
+        website: String? = null,
+        profileImageUrl: String? = null
     ): AuthResult {
         return try {
             authRemoteDataSource.updateUserProfile(
@@ -109,7 +111,8 @@ class AuthRepository @Inject constructor(
                 location = location,
                 favoriteGenre = favoriteGenre,
                 birthdate = birthdate,
-                website = website
+                website = website,
+                profileImageUrl = profileImageUrl
             )
             AuthResult(isSuccess = true)
         } catch (e: Exception) {
@@ -122,10 +125,17 @@ class AuthRepository @Inject constructor(
 
     suspend fun getUserProfile(): UserProfile? {
         return try {
+            println("AuthRepository.getUserProfile: Iniciando obtención de perfil")
             val user = currentUser ?: return null
+            println("AuthRepository.getUserProfile: Usuario autenticado: ${user.uid}")
+            
             val profileData = authRemoteDataSource.getUserProfile()
+            println("AuthRepository.getUserProfile: Datos recibidos de AuthRemoteDataSource: ${profileData != null}")
             
             if (profileData != null) {
+                val profileImageUrl = profileData["profileImageUrl"] as? String
+                println("AuthRepository.getUserProfile: profileImageUrl recuperado: $profileImageUrl")
+                
                 UserProfile(
                     uid = user.uid,
                     email = user.email ?: "",
@@ -136,11 +146,15 @@ class AuthRepository @Inject constructor(
                     location = profileData["location"] as? String,
                     birthdate = profileData["birthdate"] as? String,
                     website = profileData["website"] as? String,
+                    profileImageUrl = profileImageUrl,
                     createdAt = profileData["createdAt"] as? Long,
                     updatedAt = profileData["updatedAt"] as? Long
-                )
+                ).also {
+                    println("AuthRepository.getUserProfile: Perfil creado con profileImageUrl: ${it.profileImageUrl}")
+                }
             } else {
                 // Si no hay datos en Firestore, crear perfil básico
+                println("AuthRepository.getUserProfile: No hay datos en Firestore, creando perfil básico")
                 UserProfile(
                     uid = user.uid,
                     email = user.email ?: "",
@@ -148,6 +162,8 @@ class AuthRepository @Inject constructor(
                 )
             }
         } catch (e: Exception) {
+            println("AuthRepository.getUserProfile: ERROR al obtener perfil: ${e.message}")
+            e.printStackTrace()
             null
         }
     }

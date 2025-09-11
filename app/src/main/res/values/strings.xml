@@ -60,6 +60,7 @@
     <!-- STRINGS FALTANTES PARA EDITPROFILESCREEN - AGREGAR AL FINAL -->
     <string name="change_photo">Cambiar foto</string>
     <string name="change_photo_hint">Toca para cambiar foto</string>
+    <string name="profile_image">Imagen de perfil</string>
     <string name="personal_info_title">Información Personal</string>
     <string name="display_name_label">Nombre para mostrar</string>
     <string name="display_name_placeholder">Tu nombre público</string>
