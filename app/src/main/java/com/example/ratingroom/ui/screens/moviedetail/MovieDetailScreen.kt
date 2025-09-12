@@ -118,7 +118,7 @@ fun MovieDetailScreen(
                     item {
                         // Poster 2:3
                         MoviePoster(
-                            imageRes = movie.imageRes,
+                            imageUrl = movie.imageUrl,
                             movieTitle = movie.title,
                             width = 260.dp,
                             height = 390.dp,

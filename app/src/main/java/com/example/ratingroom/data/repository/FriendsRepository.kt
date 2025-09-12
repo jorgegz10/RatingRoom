@@ -97,7 +97,7 @@ object FriendsRepository {
                 rating = 5,
                 comment = null,
                 timestamp = "Hace 2 horas",
-                posterRes = R.drawable.dark_knight
+                posterUrl = "https://a.ltrbxd.com/resized/sm/upload/78/y5/zg/ej/oefdD26aey8GPdx7Rm45PNncJdU-0-2000-0-3000-crop.jpg?v=2d0ce4be25"
             ),
             FriendActivity(
                 id = 2,
@@ -107,7 +107,7 @@ object FriendsRepository {
                 rating = null,
                 comment = "Una película increíble",
                 timestamp = "Hace 4 horas",
-                posterRes = R.drawable.inception
+                posterUrl = "https://a.ltrbxd.com/resized/sm/upload/sv/95/s9/4j/inception-0-2000-0-3000-crop.jpg?v=30d7224316"
             ),
             FriendActivity(
                 id = 3,
@@ -117,7 +117,7 @@ object FriendsRepository {
                 rating = null,
                 comment = null,
                 timestamp = "Hace 6 horas",
-                posterRes = R.drawable.avatar
+                posterUrl = "https://a.ltrbxd.com/resized/sm/upload/1p/mh/li/l2/b7nR3eKeTOwHPKmDLUWunIGasKo-0-2000-0-3000-crop.jpg?v=0bb5ec98ec"
             )
         )
     }

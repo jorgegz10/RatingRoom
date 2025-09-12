@@ -105,7 +105,7 @@ fun ActivityMovieInfo(
     ) {
 
         MoviePoster(
-            imageRes = activity.posterRes,
+            imageUrl = activity.posterUrl,
             movieTitle = activity.movie,
             width = 60.dp,
             height = 80.dp
