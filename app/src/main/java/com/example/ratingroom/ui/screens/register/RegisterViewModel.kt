@@ -143,9 +143,7 @@ class RegisterViewModel @Inject constructor(
                 val result = authRepository.signUp(
                     email = currentState.email,
                     password = currentState.password,
-                    fullName = currentState.fullName,
-                    favoriteGenre = favoriteGenre,
-                    birthYear = birthYear
+                    displayName = currentState.fullName
                 )
                 
                 println("RegisterViewModel: Resultado recibido - isSuccess: ${result.isSuccess}")

@@ -1,6 +1,7 @@
 package com.example.ratingroom.data.repository
 
 import com.example.ratingroom.data.datasource.AuthRemoteDataSource
+import com.example.ratingroom.data.datasource.FirestoreDataSource
 import com.google.firebase.auth.FirebaseAuthActionCodeException
 import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
@@ -29,7 +30,8 @@ data class UserProfile(
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val authRemoteDataSource: AuthRemoteDataSource
+    private val authRemoteDataSource: AuthRemoteDataSource,
+    private val firestoreDataSource: FirestoreDataSource
 ) {
 
     val currentUser: FirebaseUser? get() = authRemoteDataSource.currentUser
@@ -58,18 +60,14 @@ class AuthRepository @Inject constructor(
     suspend fun signUp(
         email: String,
         password: String,
-        fullName: String? = null,
-        favoriteGenre: String? = null,
-        birthYear: String? = null
+        displayName: String? = null
     ): AuthResult {
         return try {
             println("AuthRepository: Iniciando registro para email: $email")
             val user = authRemoteDataSource.signUp(
                 email = email,
                 password = password,
-                fullName = fullName,
-                favoriteGenre = favoriteGenre,
-                birthYear = birthYear
+                displayName = displayName
             )
             println("AuthRepository: Usuario registrado: ${user?.uid}")
             val result = AuthResult(
@@ -111,7 +109,12 @@ class AuthRepository @Inject constructor(
         profileImageUrl: String? = null
     ): AuthResult {
         return try {
-            authRemoteDataSource.updateUserProfile(
+            // Actualizar en Firebase Auth si es necesario
+            displayName?.let { authRemoteDataSource.updateDisplayName(it) }
+            email?.let { authRemoteDataSource.updateUserEmail(it) }
+            
+            // Actualizar en Firestore
+            firestoreDataSource.updateUserProfile(
                 displayName = displayName,
                 email = email,
                 biography = biography,
@@ -136,8 +139,8 @@ class AuthRepository @Inject constructor(
             val user = currentUser ?: return null
             println("AuthRepository.getUserProfile: Usuario autenticado: ${user.uid}")
             
-            val profileData = authRemoteDataSource.getUserProfile()
-            println("AuthRepository.getUserProfile: Datos recibidos de AuthRemoteDataSource: ${profileData != null}")
+            val profileData = firestoreDataSource.getUserProfile()
+            println("AuthRepository.getUserProfile: Datos recibidos de FirestoreDataSource: ${profileData != null}")
             
             if (profileData != null) {
                 val profileImageUrl = profileData["profileImageUrl"] as? String
