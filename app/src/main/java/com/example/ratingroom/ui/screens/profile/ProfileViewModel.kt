@@ -35,6 +35,15 @@ class ProfileViewModel @Inject constructor(
                     println("ProfileViewModel.loadProfile: Perfil cargado con éxito")
                     println("ProfileViewModel.loadProfile: profileImageUrl: ${userProfile.profileImageUrl}")
                     
+                    // Asegurarse de que la URL de la imagen no sea nula o vacía
+                    val imageUrl = if (!userProfile.profileImageUrl.isNullOrEmpty()) {
+                        println("ProfileViewModel.loadProfile: Usando URL de imagen de Firebase: ${userProfile.profileImageUrl}")
+                        userProfile.profileImageUrl
+                    } else {
+                        println("ProfileViewModel.loadProfile: No hay URL de imagen disponible")
+                        null
+                    }
+                    
                     val profileData = ProfileData(
                         name = userProfile.fullName ?: "Usuario",
                         email = userProfile.email,
@@ -42,7 +51,7 @@ class ProfileViewModel @Inject constructor(
                         favoriteGenre = userProfile.favoriteGenre ?: "No especificado",
                         reviewsCount = 0, // Esto vendría de otra fuente
                         averageRating = 0.0, // Esto vendría de otra fuente
-                        profileImageUrl = userProfile.profileImageUrl
+                        profileImageUrl = imageUrl
                     )
                     
                     _uiState.value = _uiState.value.copy(
@@ -74,5 +83,10 @@ class ProfileViewModel @Inject constructor(
     
     fun clearError() {
         _uiState.value = _uiState.value.copy(errorMessage = null)
+    }
+    
+    fun refreshProfile() {
+        println("ProfileViewModel.refreshProfile: Refrescando perfil")
+        loadProfile()
     }
 }

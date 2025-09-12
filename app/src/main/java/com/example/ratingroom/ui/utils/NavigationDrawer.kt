@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.ratingroom.R
 import com.example.ratingroom.navigation.Screen
+import com.example.ratingroom.ui.screens.profile.ProfileData
+import com.example.ratingroom.ui.utils.AvatarInitials
 
 @Composable
 fun ModernNavigationDrawer(
@@ -33,6 +35,7 @@ fun ModernNavigationDrawer(
     currentRoute: String?,
     onNavigate: (String) -> Unit,
     onLogout: () -> Unit,
+    profileData: ProfileData? = null,
     modifier: Modifier = Modifier
 ) {
     val animatedWidth by animateDpAsState(
@@ -88,7 +91,8 @@ fun ModernNavigationDrawer(
                 ) {
                     DrawerHeader(
                         alpha = animatedAlpha,
-                        onClose = onToggle
+                        onClose = onToggle,
+                        profileData = profileData
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -114,7 +118,8 @@ fun ModernNavigationDrawer(
 @Composable
 private fun DrawerHeader(
     alpha: Float,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    profileData: ProfileData? = null
 ) {
     Column(
         modifier = Modifier
@@ -159,34 +164,23 @@ private fun DrawerHeader(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                .background(
-                    MaterialTheme.colorScheme.primary,
-                    CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "U",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
+        AvatarInitials(
+            initials = profileData?.name?.take(2)?.uppercase() ?: "U",
+            imageUrl = profileData?.profileImageUrl,
+            size = 64.dp
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Usuario",
+            text = profileData?.name ?: "Usuario",
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
-            text = "usuario@email.com",
+            text = profileData?.email ?: "usuario@email.com",
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

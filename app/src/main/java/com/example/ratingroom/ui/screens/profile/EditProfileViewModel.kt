@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import java.util.UUID
 
 @HiltViewModel
@@ -114,48 +117,59 @@ class EditProfileViewModel @Inject constructor(
     }
     
     private suspend fun uploadProfileImage(uri: Uri): String? {
-        return try {
-            println("uploadProfileImage: Iniciando subida de imagen a Firebase Storage")
-            val user = authRepository.currentUser ?: throw IllegalStateException("Usuario no autenticado")
-            println("uploadProfileImage: Usuario autenticado: ${user.uid}")
-            
-            // Verificar que la URI sea válida
-            if (uri.scheme == null) {
-                println("uploadProfileImage: ERROR - URI inválida: no tiene scheme")
-                throw IllegalArgumentException("URI inválida: no tiene scheme")
-            }
-            
-            println("uploadProfileImage: URI a subir: $uri")
-            println("uploadProfileImage: URI scheme: ${uri.scheme}, path: ${uri.path}")
-            
-            val fileRef = storage.reference.child("profile_images/${user.uid}/${UUID.randomUUID()}.jpg")
-            println("uploadProfileImage: Referencia de archivo creada: ${fileRef.path}")
-            
-            println("uploadProfileImage: Iniciando putFile...")
+        return withContext(NonCancellable + Dispatchers.IO) {
             try {
-                println("uploadProfileImage: Ejecutando putFile y esperando resultado...")
-                val uploadTask = fileRef.putFile(uri).await()
-                println("uploadProfileImage: Archivo subido exitosamente, bytes transferidos: ${uploadTask.bytesTransferred}")
-                println("uploadProfileImage: Obteniendo URL de descarga...")
+                println("uploadProfileImage: Iniciando subida de imagen a Firebase Storage")
+                val user = authRepository.currentUser ?: throw IllegalStateException("Usuario no autenticado")
+                println("uploadProfileImage: Usuario autenticado: ${user.uid}")
                 
-                val downloadUrl = fileRef.downloadUrl.await()
-                println("uploadProfileImage: URL de descarga obtenida: $downloadUrl")
+                // Verificar que la URI sea válida
+                if (uri.scheme == null) {
+                    println("uploadProfileImage: ERROR - URI inválida: no tiene scheme")
+                    throw IllegalArgumentException("URI inválida: no tiene scheme")
+                }
                 
-                downloadUrl.toString()
+                println("uploadProfileImage: URI a subir: $uri")
+                println("uploadProfileImage: URI scheme: ${uri.scheme}, path: ${uri.path}")
+                
+                val fileRef = storage.reference.child("profile_images/${user.uid}/${UUID.randomUUID()}.jpg")
+                println("uploadProfileImage: Referencia de archivo creada: ${fileRef.path}")
+                
+                println("uploadProfileImage: Iniciando putFile...")
+                try {
+                    println("uploadProfileImage: Ejecutando putFile y esperando resultado...")
+                    val uploadTask = fileRef.putFile(uri).await()
+                    println("uploadProfileImage: Archivo subido exitosamente, bytes transferidos: ${uploadTask.bytesTransferred}")
+                    println("uploadProfileImage: Obteniendo URL de descarga...")
+                    
+                    val downloadUrl = fileRef.downloadUrl.await()
+                    val downloadUrlString = downloadUrl.toString()
+                    println("uploadProfileImage: URL de descarga obtenida: $downloadUrlString")
+                    
+                    // Verificar que la URL no esté vacía
+                    if (downloadUrlString.isEmpty()) {
+                        println("uploadProfileImage: ADVERTENCIA - URL de descarga está vacía")
+                        throw IllegalStateException("La URL de descarga está vacía")
+                    }
+                    
+                    downloadUrlString
+                } catch (e: Exception) {
+                    println("uploadProfileImage: ERROR específico en putFile o downloadUrl: ${e.message}")
+                    println("uploadProfileImage: Stacktrace del error:")
+                    e.printStackTrace()
+                    throw e
+                }
             } catch (e: Exception) {
-                println("uploadProfileImage: ERROR específico en putFile o downloadUrl: ${e.message}")
-                println("uploadProfileImage: Stacktrace del error:")
+                println("uploadProfileImage: ERROR general al subir imagen: ${e.message}")
+                println("uploadProfileImage: Stacktrace del error general:")
                 e.printStackTrace()
-                throw e
+                withContext(Dispatchers.Main) {
+                    _uiState.value = _uiState.value.copy(
+                        errorMessage = "Error al subir la imagen: ${e.message}"
+                    )
+                }
+                null
             }
-        } catch (e: Exception) {
-            println("uploadProfileImage: ERROR general al subir imagen: ${e.message}")
-            println("uploadProfileImage: Stacktrace del error general:")
-            e.printStackTrace()
-            _uiState.value = _uiState.value.copy(
-                errorMessage = "Error al subir la imagen: ${e.message}"
-            )
-            null
         }
     }
 
@@ -216,7 +230,20 @@ class EditProfileViewModel @Inject constructor(
                         }
                         
                         println("SaveProfile: URI válido, subiendo imagen...")
-                        profileImageUrl = uploadProfileImage(uri)
+                        val uploadedImageUrl = uploadProfileImage(uri)
+                        
+                        if (!uploadedImageUrl.isNullOrEmpty()) {
+                            println("SaveProfile: URL de imagen obtenida correctamente: $uploadedImageUrl")
+                            profileImageUrl = uploadedImageUrl
+                        } else {
+                            println("SaveProfile: ADVERTENCIA - No se pudo obtener URL de imagen")
+                            _uiState.value = _uiState.value.copy(
+                                isSaving = false,
+                                errorMessage = "No se pudo obtener la URL de la imagen"
+                            )
+                            return@launch
+                        }
+                        
                         println("SaveProfile: URL de imagen después de subir: $profileImageUrl")
                     } catch (e: Exception) {
                         println("SaveProfile: Error al procesar URI: ${e.message}")
@@ -251,6 +278,7 @@ class EditProfileViewModel @Inject constructor(
                 if (result.isSuccess) {
                     _uiState.value = _uiState.value.copy(
                         isSaving = false,
+                        saveCompleted = true,
                         successMessage = "Perfil actualizado exitosamente"
                     )
                 } else {
@@ -271,7 +299,8 @@ class EditProfileViewModel @Inject constructor(
     fun clearMessages() {
         _uiState.value = _uiState.value.copy(
             errorMessage = null,
-            successMessage = null
+            successMessage = null,
+            saveCompleted = false
         )
     }
 }

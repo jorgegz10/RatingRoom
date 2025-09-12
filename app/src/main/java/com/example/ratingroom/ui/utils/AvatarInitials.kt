@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,13 +28,15 @@ fun AvatarInitials(
     imageUrl: String? = null
 ) {
     val cs = MaterialTheme.colorScheme
+    var imageLoadFailed by remember(imageUrl) { mutableStateOf(false) }
+    
     Surface(
         color = cs.surfaceVariant,
         shape = CircleShape,
         modifier = Modifier.size(size).clip(CircleShape)
     ) {
         Box(Modifier.size(size), contentAlignment = Alignment.Center) {
-            if (imageUrl != null) {
+            if (!imageUrl.isNullOrEmpty() && !imageLoadFailed) {
                 println("AvatarInitials: Mostrando imagen con URL: $imageUrl")
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -41,8 +47,14 @@ fun AvatarInitials(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
                     onLoading = { println("AvatarInitials: Cargando imagen...") },
-                    onSuccess = { println("AvatarInitials: Imagen cargada exitosamente") },
-                    onError = { println("AvatarInitials: Error al cargar imagen: $imageUrl") }
+                    onSuccess = { 
+                        println("AvatarInitials: Imagen cargada exitosamente")
+                        imageLoadFailed = false
+                    },
+                    onError = { 
+                        println("AvatarInitials: Error al cargar imagen: $imageUrl")
+                        imageLoadFailed = true
+                    }
                 )
             } else {
                 println("AvatarInitials: Mostrando iniciales: $initials")

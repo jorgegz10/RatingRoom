@@ -11,6 +11,7 @@ data class EditProfileUIState(
     val profileImageUri: String? = null,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
+    val saveCompleted: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null
 )

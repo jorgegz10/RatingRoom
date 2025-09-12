@@ -29,6 +29,11 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isDarkMode = uiState.isDarkMode.takeIf { uiState.profileData != null } ?: isSystemInDarkTheme()
+    
+    // Refrescar el perfil cuando se regresa a la pantalla
+    LaunchedEffect(Unit) {
+        viewModel.refreshProfile()
+    }
 
     ProfileScreenContent(
         uiState = uiState,
@@ -125,9 +130,12 @@ fun ProfileHeader(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             println("ProfileHeader: Mostrando perfil con nombre: ${profileData.name}, imageUrl: ${profileData.profileImageUrl}")
+            // Asegurarse de que la URL de la imagen no sea nula o vacía antes de pasarla al componente
+            val imageUrl = profileData.profileImageUrl
+            println("ProfileHeader: URL de imagen a mostrar: $imageUrl")
             AvatarInitials(
                 initials = profileData.name.take(2).uppercase(),
-                imageUrl = profileData.profileImageUrl
+                imageUrl = imageUrl
             )
             Spacer(Modifier.height(12.dp))
             Text(

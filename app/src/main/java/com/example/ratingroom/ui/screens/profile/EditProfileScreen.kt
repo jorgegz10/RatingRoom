@@ -45,6 +45,19 @@ fun EditProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
+    // Efecto para navegar cuando el guardado se completa exitosamente
+    LaunchedEffect(uiState.saveCompleted) {
+        if (uiState.saveCompleted) {
+            // Navegar solo cuando el guardado se ha completado
+            onSave()
+            // Limpiar el estado para evitar navegaciones repetidas
+            viewModel.clearMessages()
+        }
+    }
+    
+    // Estado para controlar si estamos esperando que termine la subida de imagen
+    var isWaitingForImageUpload by remember { mutableStateOf(false) }
+    
     // Estado para controlar la visibilidad del diálogo de confirmación
     var showConfirmDialog by remember { mutableStateOf(false) }
     
@@ -56,8 +69,18 @@ fun EditProfileScreen(
             println("URI seleccionada en EditProfileScreen: $it")
             println("URI scheme: ${it.scheme}, path: ${it.path}")
             viewModel.onProfileImageSelected(it)
+            // Marcar que estamos esperando la subida de imagen
+            isWaitingForImageUpload = true
             // Guardar automáticamente cuando se selecciona una imagen
             viewModel.saveProfile()
+            // La navegación se manejará en el LaunchedEffect cuando se complete
+        }
+    }
+    
+    // Efecto para resetear el estado de espera cuando se completa o falla la subida
+    LaunchedEffect(uiState.isSaving, uiState.saveCompleted, uiState.errorMessage) {
+        if (isWaitingForImageUpload && (!uiState.isSaving || uiState.saveCompleted || uiState.errorMessage != null)) {
+            isWaitingForImageUpload = false
         }
     }
 
@@ -86,17 +109,21 @@ fun EditProfileScreen(
             }
         )
     }
-    
-    // Función para manejar el botón de retroceso
+
     val handleBackClick = {
-        // Si hay una imagen seleccionada, guardar automáticamente
-        if (uiState.profileImageUri != null) {
-            viewModel.saveProfile()
-            onSave()
-        } else {
-            // Si hay otros cambios, mostrar diálogo de confirmación
-            showConfirmDialog = true
+        // Si estamos esperando que termine la subida de imagen, no permitir navegación
+        if (!(isWaitingForImageUpload || uiState.isSaving)) {
+
+            if (uiState.profileImageUri != null && !uiState.isSaving) {
+                isWaitingForImageUpload = true
+                viewModel.saveProfile()
+
+            } else {
+
+                showConfirmDialog = true
+            }
         }
+
     }
     
     EditProfileScreenContent(
@@ -110,8 +137,11 @@ fun EditProfileScreen(
         onWebsiteChange = viewModel::onWebsiteChange,
         onSelectImage = { galleryLauncher.launch("image/*") },
         onSave = {
-            viewModel.saveProfile()
-            onSave()
+            // Si no estamos esperando una subida de imagen, proceder normalmente
+            if (!isWaitingForImageUpload && !uiState.isSaving) {
+                viewModel.saveProfile()
+                // La navegación se manejará en el LaunchedEffect cuando se complete
+            }
         },
         onBackClick = handleBackClick,
         modifier = modifier
