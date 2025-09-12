@@ -180,4 +180,5 @@ class RegisterViewModel @Inject constructor(
             successMessage = null
         )
     }
+
 }
