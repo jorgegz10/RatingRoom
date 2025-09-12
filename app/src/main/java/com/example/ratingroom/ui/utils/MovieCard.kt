@@ -41,7 +41,7 @@ fun MovieCard(
             // ---------- Poster + chips ----------
             Box {
                 MoviePoster(
-                    imageRes = movie.imageRes,
+                    imageUrl = movie.imageUrl,
                     movieTitle = movie.title,
                     width = 220.dp,
                     height = 130.dp,

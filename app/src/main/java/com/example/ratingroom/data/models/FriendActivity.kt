@@ -10,6 +10,6 @@ data class FriendActivity(
     val rating: Int? = null,
     val comment: String? = null,
     val timestamp: String,
-    @DrawableRes val posterRes: Int
+    val posterUrl: String? = null
 
 )

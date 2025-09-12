@@ -18,7 +18,8 @@ object MovieRepository {
             description = "Una épica historia de amor ambientada en el trágico viaje del Titanic.",
             director = "James Cameron",
             duration = "3h 14min",
-            imageRes = R.drawable.titanic
+            imageUrl = "https://a.ltrbxd.com/resized/film-poster/5/1/5/2/4/51524-titanic-0-2000-0-3000-crop.jpg?v=7517ea94ce",
+
         ),
         Movie(
             id = 2,
@@ -30,7 +31,8 @@ object MovieRepository {
             description = "Historias entrelazadas de crimen en Los Ángeles.",
             director = "Quentin Tarantino",
             duration = "2h 34min",
-            imageRes = R.drawable.pulp_fiction
+            imageUrl = "https://a.ltrbxd.com/resized/film-poster/5/1/4/4/4/51444-pulp-fiction-0-2000-0-3000-crop.jpg?v=dee19a8077"
+
         ),
         Movie(
             id = 3,
@@ -42,7 +44,7 @@ object MovieRepository {
             description = "Batman enfrenta al Joker en Gotham City.",
             director = "Christopher Nolan",
             duration = "2h 32min",
-            imageRes = R.drawable.dark_knight
+            imageUrl = "https://a.ltrbxd.com/resized/sm/upload/78/y5/zg/ej/oefdD26aey8GPdx7Rm45PNncJdU-0-2000-0-3000-crop.jpg?v=2d0ce4be25"
         ),
         Movie(
             id = 4,
@@ -54,7 +56,7 @@ object MovieRepository {
             description = "Un marine parapléjico es enviado a la luna Pandora.",
             director = "James Cameron",
             duration = "2h 42min",
-            imageRes = R.drawable.avatar
+            imageUrl = "https://a.ltrbxd.com/resized/sm/upload/1p/mh/li/l2/b7nR3eKeTOwHPKmDLUWunIGasKo-0-2000-0-3000-crop.jpg?v=0bb5ec98ec"
         ),
         Movie(
             id = 5,
@@ -66,7 +68,7 @@ object MovieRepository {
             description = "Dinosaurios clonados en un parque temático.",
             director = "Steven Spielberg",
             duration = "2h 7min",
-            imageRes = R.drawable.jurassic_park
+            imageUrl = "https://a.ltrbxd.com/resized/sm/upload/1g/zz/ez/d8/yyCKYaW908ZbpexpnBJ3p8o87HA-0-2000-0-3000-crop.jpg?v=19a50874d0"
         ),
         Movie(
             id = 6,
@@ -78,7 +80,7 @@ object MovieRepository {
             description = "La historia de Henry Hill y la mafia italiana.",
             director = "Martin Scorsese",
             duration = "2h 26min",
-            imageRes = R.drawable.goodfellas
+            imageUrl = "https://a.ltrbxd.com/resized/film-poster/5/1/3/8/3/51383-goodfellas-0-2000-0-3000-crop.jpg?v=c6c265f228"
         ),
         Movie(
             id = 7,
@@ -90,7 +92,7 @@ object MovieRepository {
             description = "Un ladrón que roba secretos del subconsciente.",
             director = "Christopher Nolan",
             duration = "2h 28min",
-            imageRes = R.drawable.inception
+            imageUrl = "https://a.ltrbxd.com/resized/sm/upload/sv/95/s9/4j/inception-0-2000-0-3000-crop.jpg?v=30d7224316"
         ),
         Movie(
             id = 8,
@@ -102,7 +104,7 @@ object MovieRepository {
             description = "La amistad entre dos prisioneros a lo largo de los años.",
             director = "Frank Darabont",
             duration = "2h 22min",
-            imageRes = R.drawable.shawshank_redemption
+            imageUrl = "https://a.ltrbxd.com/resized/sm/upload/7l/hn/46/uz/zGINvGjdlO6TJRu9wESQvWlOKVT-0-2000-0-3000-crop.jpg?v=8736d1c395"
         )
     )
 

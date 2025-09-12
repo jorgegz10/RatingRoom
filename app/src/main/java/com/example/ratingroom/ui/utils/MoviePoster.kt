@@ -1,6 +1,5 @@
 package com.example.ratingroom.ui.utils
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -16,13 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 
 @Composable
 fun MoviePoster(
-    imageRes: Int?,
+    imageUrl: String?,
     movieTitle: String,
     width: Dp = 220.dp,
     height: Dp = 130.dp,
@@ -36,9 +35,9 @@ fun MoviePoster(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        if (imageRes != null) {
-            Image(
-                painter = painterResource(id = imageRes),
+        if (!imageUrl.isNullOrBlank()) {
+            AsyncImage(
+                model = imageUrl,
                 contentDescription = movieTitle,
                 modifier = Modifier
                     .fillMaxSize()
@@ -60,11 +59,16 @@ fun MoviePoster(
     }
 }
 
-
 @Composable
 fun MoviePoster(
     movieTitle: String,
     width: Dp = 220.dp,
     height: Dp = 130.dp,
     modifier: Modifier = Modifier
-) = MoviePoster(imageRes = null, movieTitle = movieTitle, width = width, height = height, modifier = modifier)
+) = MoviePoster(
+    imageUrl = null,
+    movieTitle = movieTitle,
+    width = width,
+    height = height,
+    modifier = modifier
+)
