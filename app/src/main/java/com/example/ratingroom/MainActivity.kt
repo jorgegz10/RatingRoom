@@ -25,6 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.ratingroom.navigation.Screen
+import com.example.ratingroom.ui.screens.app.MainViewModel
 import com.example.ratingroom.ui.screens.favorites.FavoritesScreen
 import com.example.ratingroom.ui.screens.forgotpassword.ForgotPasswordScreen
 import com.example.ratingroom.ui.screens.friends.FriendsScreen
@@ -61,7 +62,9 @@ fun RatingRoomApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    var isDrawerOpen by remember { mutableStateOf(false) }
+    // Usar el MainViewModel para manejar el estado de la UI
+    val mainViewModel: MainViewModel = hiltViewModel()
+    val mainUiState by mainViewModel.uiState.collectAsState()
     
     // Obtener datos del usuario para el drawer
     val profileViewModel: ProfileViewModel = hiltViewModel()
@@ -69,7 +72,7 @@ fun RatingRoomApp() {
 
     val navigateToScreen: (String) -> Unit = { route ->
         navController.navigate(route) { launchSingleTop = true }
-        isDrawerOpen = false
+        mainViewModel.updateDrawerState(false)
     }
 
     val navigateBack: () -> Unit = {
@@ -82,34 +85,18 @@ fun RatingRoomApp() {
                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
             }
         }
-        isDrawerOpen = false
+        mainViewModel.updateDrawerState(false)
         println("MainActivity: navigateBack() completado")
     }
 
     // Determinar si mostrar drawer y topbar basado en la ruta actual
-    val isAuthScreen = currentRoute in listOf(
-        Screen.Login.route,
-        Screen.Register.route,
-        Screen.ForgotPassword.route
-    )
+    val isAuthScreen = mainViewModel.isAuthScreen(currentRoute ?: "")
     
     val showTopBar = !isAuthScreen
     val showDrawer = !isAuthScreen
 
-    // Obtener el título de la pantalla actual
-    val currentTitle = when {
-        currentRoute == Screen.MainMenu.route -> Screen.MainMenu.title
-        currentRoute == Screen.Profile.route -> Screen.Profile.title
-        currentRoute == Screen.Friends.route -> Screen.Friends.title
-        currentRoute == Screen.List.route -> Screen.List.title
-        currentRoute == Screen.Reviews.route -> Screen.Reviews.title
-        currentRoute == Screen.Favorites.route -> Screen.Favorites.title
-        currentRoute == Screen.Settings.route -> Screen.Settings.title
-        currentRoute == Screen.EditProfile.route -> Screen.EditProfile.title
-        currentRoute?.startsWith("movie_detail/") == true -> Screen.MovieDetail.title
-        currentRoute?.startsWith("synopsis/") == true -> Screen.Synopsis.title
-        else -> "RatingRoom"
-    }
+    // Obtener el título de la pantalla actual usando el ViewModel
+    val currentTitle = mainViewModel.getCurrentTitle(currentRoute ?: "")
 
     GradientBackground {
         Box(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars.only(
@@ -119,11 +106,11 @@ fun RatingRoomApp() {
 
                 topBar = {
                     if (showTopBar) {
-                        ModernTopBar(
-                            title = currentTitle,
-                            onMenuClick = { isDrawerOpen = true }
-                        )
-                    }
+                ModernTopBar(
+                    title = currentTitle,
+                    onMenuClick = { mainViewModel.toggleDrawer() }
+                )
+            }
                 },
                 containerColor = Color.Transparent,
                 contentWindowInsets = WindowInsets(0,0,0,0)
@@ -237,15 +224,15 @@ fun RatingRoomApp() {
 
             if (showDrawer) {
                 ModernNavigationDrawer(
-                    isOpen = isDrawerOpen,
-                    onToggle = { isDrawerOpen = !isDrawerOpen },
+                    isOpen = mainUiState.isDrawerOpen,
+                    onToggle = { mainViewModel.toggleDrawer() },
                     currentRoute = currentRoute,
                     onNavigate = { route -> navigateToScreen(route) },
                     onLogout = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }
-                        isDrawerOpen = false
+                        mainViewModel.updateDrawerState(false)
                     },
                     profileData = profileUiState.profileData
                 )
