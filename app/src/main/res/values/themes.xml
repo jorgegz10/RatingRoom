@@ -2,4 +2,22 @@
 <resources>
 
     <style name="Theme.RatingRoom" parent="android:Theme.Material.Light.NoActionBar" />
+    
+    <!-- Tema para Splash Screen -->
+    <style name="Theme.RatingRoom.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logoratingroom</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.RatingRoom</item>
+    </style>
+    
+    <!-- Tema alternativo para dispositivos más antiguos -->
+    <style name="Theme.RatingRoom.SplashScreenLegacy" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
 </resources>

@@ -10,5 +10,8 @@
     <!-- Colores adicionales -->
     <color name="light_gray">#F5F5F5</color>
     <color name="medium_gray">#9E9E9E</color>
+    
+    <!-- Color para splash screen -->
+    <color name="splash_background">#415EC2</color>
 
 </resources>

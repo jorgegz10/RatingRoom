@@ -1,6 +1,7 @@
 package com.example.ratingroom.data.repository
 
 import com.example.ratingroom.data.datasource.AuthRemoteDataSource
+import com.google.firebase.auth.FirebaseAuthActionCodeException
 import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -40,7 +41,13 @@ class AuthRepository @Inject constructor(
                 isSuccess = user != null,
                 user = user
             )
-        } catch (e: Exception) {
+        } catch (e: FirebaseAuthActionCodeException){
+            AuthResult(
+                isSuccess = false,
+                errorMessage = "contrasena invalida" ?: "Error de autenticación"
+            )
+        }
+        catch (e: Exception) {
             AuthResult(
                 isSuccess = false,
                 errorMessage = e.message ?: "Error de autenticación"

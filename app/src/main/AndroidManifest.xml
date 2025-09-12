@@ -13,18 +13,24 @@
         android:roundIcon="@drawable/logoratingroom"
         android:supportsRtl="true"
         android:theme="@style/Theme.RatingRoom">
+        <!-- Splash Screen Activity -->
         <activity
-            android:name=".MainActivity"
-            android:resizeableActivity="true"
+            android:name=".SplashActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.RatingRoom">
+            android:theme="@style/Theme.RatingRoom.SplashScreenLegacy">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- Main Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:resizeableActivity="true"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.RatingRoom" />
     </application>
 
 </manifest>
