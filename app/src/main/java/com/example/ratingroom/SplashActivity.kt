@@ -31,11 +31,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.ratingroom.data.repository.AuthRepository
 import com.example.ratingroom.ui.theme.RatingRoomTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import javax.inject.Inject
 
 @SuppressLint("CustomSplashScreen")
+@AndroidEntryPoint
 class SplashActivity : ComponentActivity() {
+    
+    @Inject
+    lateinit var authRepository: AuthRepository
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         // Instalar splash screen nativo para Android 12+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -47,17 +55,28 @@ class SplashActivity : ComponentActivity() {
         setContent {
             RatingRoomTheme {
                 SplashScreen {
-                    // Navegar a MainActivity después del splash
-                    navigateToMainActivity()
+                    // Verificar si el usuario ya está autenticado
+                    checkAuthAndNavigate()
                 }
             }
         }
     }
     
-    private fun navigateToMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
+    private fun checkAuthAndNavigate() {
+        // Verificar si el usuario ya está autenticado
+        val isUserLoggedIn = authRepository.isUserLoggedIn()
+        
+        val intent = Intent(this, MainActivity::class.java).apply {
+            // Pasar información sobre el estado de autenticación
+            putExtra(EXTRA_IS_USER_LOGGED_IN, isUserLoggedIn)
+        }
+        
         startActivity(intent)
         finish()
+    }
+    
+    companion object {
+        const val EXTRA_IS_USER_LOGGED_IN = "extra_is_user_logged_in"
     }
 }
 

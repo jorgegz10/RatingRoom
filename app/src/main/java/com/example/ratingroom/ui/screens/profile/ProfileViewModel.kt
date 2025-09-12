@@ -89,4 +89,9 @@ class ProfileViewModel @Inject constructor(
         println("ProfileViewModel.refreshProfile: Refrescando perfil")
         loadProfile()
     }
+    
+    fun logout() {
+        println("ProfileViewModel.logout: Cerrando sesión")
+        authRepository.signOut()
+    }
 }

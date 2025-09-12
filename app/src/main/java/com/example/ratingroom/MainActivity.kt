@@ -51,13 +51,21 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { RatingRoomTheme { RatingRoomApp() } }
+        
+        // Obtener el estado de autenticación pasado desde SplashActivity
+        val isUserLoggedIn = intent.getBooleanExtra(SplashActivity.EXTRA_IS_USER_LOGGED_IN, false)
+        
+        setContent { 
+            RatingRoomTheme { 
+                RatingRoomApp(isUserLoggedIn = isUserLoggedIn) 
+            } 
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RatingRoomApp() {
+fun RatingRoomApp(isUserLoggedIn: Boolean = false) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -116,9 +124,16 @@ fun RatingRoomApp() {
                 contentWindowInsets = WindowInsets(0,0,0,0)
             ) { innerPadding ->
 
+                // Determinar la pantalla inicial basada en el estado de autenticación
+                val startDestination = if (isUserLoggedIn) {
+                    Screen.MainMenu.route
+                } else {
+                    Screen.Login.route
+                }
+                
                 NavHost(
                     navController = navController,
-                    startDestination = Screen.Login.route,
+                    startDestination = startDestination,
                     modifier = Modifier.padding(innerPadding)
                 ) {
                     // ---------- AUTH ----------
@@ -229,6 +244,9 @@ fun RatingRoomApp() {
                     currentRoute = currentRoute,
                     onNavigate = { route -> navigateToScreen(route) },
                     onLogout = {
+                        // Cerrar sesión usando el ProfileViewModel
+                        profileViewModel.logout()
+                        // Navegar a la pantalla de login
                         navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }

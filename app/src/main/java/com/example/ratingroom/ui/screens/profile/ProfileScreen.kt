@@ -34,12 +34,18 @@ fun ProfileScreen(
     LaunchedEffect(Unit) {
         viewModel.refreshProfile()
     }
+    
+    // Función para manejar el cierre de sesión
+    val handleLogout = {
+        viewModel.logout()
+        onLogoutClick()
+    }
 
     ProfileScreenContent(
         uiState = uiState,
         isDarkMode = isDarkMode,
         onEditClick = onEditClick,
-        onLogoutClick = onLogoutClick,
+        onLogoutClick = handleLogout,
         onDarkModeChange = viewModel::onDarkModeChange,
         modifier = modifier
     )
