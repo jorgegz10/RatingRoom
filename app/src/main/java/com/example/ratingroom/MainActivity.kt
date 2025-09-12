@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,6 +34,7 @@ import com.example.ratingroom.ui.screens.main.MainMenuScreen
 import com.example.ratingroom.ui.screens.moviedetail.MovieDetailRoute
 import com.example.ratingroom.ui.screens.profile.EditProfileScreen
 import com.example.ratingroom.ui.screens.profile.ProfileScreen
+import com.example.ratingroom.ui.screens.profile.ProfileViewModel
 import com.example.ratingroom.ui.screens.register.RegisterScreen
 import com.example.ratingroom.ui.screens.reviews.ReviewsScreen
 import com.example.ratingroom.ui.screens.settings.SettingsScreen
@@ -60,6 +62,10 @@ fun RatingRoomApp() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     var isDrawerOpen by remember { mutableStateOf(false) }
+    
+    // Obtener datos del usuario para el drawer
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+    val profileUiState by profileViewModel.uiState.collectAsState()
 
     val navigateToScreen: (String) -> Unit = { route ->
         navController.navigate(route) { launchSingleTop = true }
@@ -240,7 +246,8 @@ fun RatingRoomApp() {
                             popUpTo(0) { inclusive = true }
                         }
                         isDrawerOpen = false
-                    }
+                    },
+                    profileData = profileUiState.profileData
                 )
             }
         }

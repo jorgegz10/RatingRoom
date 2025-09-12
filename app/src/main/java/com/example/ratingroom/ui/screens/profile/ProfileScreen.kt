@@ -29,6 +29,11 @@ fun ProfileScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isDarkMode = uiState.isDarkMode.takeIf { uiState.profileData != null } ?: isSystemInDarkTheme()
+    
+    // Refrescar el perfil cuando se regresa a la pantalla
+    LaunchedEffect(Unit) {
+        viewModel.refreshProfile()
+    }
 
     ProfileScreenContent(
         uiState = uiState,
@@ -124,7 +129,14 @@ fun ProfileHeader(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AvatarInitials(initials = profileData.name.take(2).uppercase())
+            println("ProfileHeader: Mostrando perfil con nombre: ${profileData.name}, imageUrl: ${profileData.profileImageUrl}")
+            // Asegurarse de que la URL de la imagen no sea nula o vacía antes de pasarla al componente
+            val imageUrl = profileData.profileImageUrl
+            println("ProfileHeader: URL de imagen a mostrar: $imageUrl")
+            AvatarInitials(
+                initials = profileData.name.take(2).uppercase(),
+                imageUrl = imageUrl
+            )
             Spacer(Modifier.height(12.dp))
             Text(
                 text = profileData.name,
@@ -258,7 +270,8 @@ fun ProfileScreenPreview() {
                     memberSince = "Enero 2024",
                     favoriteGenre = "Sci-Fi",
                     reviewsCount = 3,
-                    averageRating = 4.7
+                    averageRating = 4.7,
+                    profileImageUrl = null
                 ),
                 isDarkMode = false,
                 isLoading = false

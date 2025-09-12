@@ -6,7 +6,8 @@ data class ProfileData(
     val memberSince: String,
     val favoriteGenre: String,
     val reviewsCount: Int,
-    val averageRating: Double
+    val averageRating: Double,
+    val profileImageUrl: String? = null
 )
 
 data class ProfileUIState(
